@@ -1,0 +1,347 @@
+/*
+ * MentorBridge - Professional Color Palette & Variables
+ * Use these CSS variables across all pages for consistency
+ */
+
+:root {
+    /* Main Color Palette */
+    --color-1: #F0F3FA;  /* Lightest - Backgrounds */
+    --color-2: #D5DEEF;  /* Light - Secondary backgrounds */
+    --color-3: #B1C9EF;  /* Medium-Light - Accents */
+    --color-4: #8AAEE0;  /* Medium - Interactive elements */
+    --color-5: #638ECB;  /* Brand Primary - Buttons, links */
+    --color-6: #395886;  /* Dark Brand - Headers, text */
+    
+    /* Supporting Colors */
+    --white: #ffffff;
+    --text-dark: #1a202c;
+    --text-light: #4a5568;
+    --text-muted: #718096;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(57, 88, 134, 0.08);
+    --shadow: 0 10px 30px rgba(57, 88, 134, 0.1);
+    --shadow-hover: 0 20px 50px rgba(57, 88, 134, 0.2);
+    --shadow-lg: 0 25px 60px rgba(57, 88, 134, 0.25);
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--color-5), var(--color-6));
+    --gradient-light: linear-gradient(135deg, var(--color-1), var(--color-2));
+    --gradient-accent: linear-gradient(135deg, var(--color-3), var(--color-4));
+    --gradient-full: linear-gradient(135deg, var(--color-6), var(--color-5), var(--color-4));
+    
+    /* Status Colors */
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --error: #ef4444;
+    --error-light: #fee2e2;
+    --info: var(--color-4);
+    --info-light: var(--color-1);
+    
+    /* Spacing */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+    --space-2xl: 4rem;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    --font-size-4xl: 2.5rem;
+    --font-size-5xl: 3rem;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ================================
+   UTILITY CLASSES
+   ================================ */
+
+/* Backgrounds */
+.bg-gradient-primary { background: var(--gradient-primary); }
+.bg-gradient-light { background: var(--gradient-light); }
+.bg-gradient-accent { background: var(--gradient-accent); }
+.bg-white { background: var(--white); }
+.bg-light { background: var(--color-1); }
+
+/* Text Colors */
+.text-primary { color: var(--color-6); }
+.text-secondary { color: var(--color-5); }
+.text-dark { color: var(--text-dark); }
+.text-light { color: var(--text-light); }
+.text-muted { color: var(--text-muted); }
+.text-white { color: var(--white); }
+
+/* Shadows */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow { box-shadow: var(--shadow); }
+.shadow-hover { box-shadow: var(--shadow-hover); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* Border Radius */
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-2xl { border-radius: var(--radius-2xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* ================================
+   COMMON COMPONENTS
+   ================================ */
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-family);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left var(--transition-slow);
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: var(--shadow);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--color-6);
+    border: 2px solid var(--color-5);
+}
+
+.btn-secondary:hover {
+    background: var(--color-1);
+    transform: translateY(-2px);
+}
+
+.btn-sm {
+    padding: 0.5rem 1.5rem;
+    font-size: var(--font-size-sm);
+}
+
+.btn-lg {
+    padding: 1rem 2.5rem;
+    font-size: var(--font-size-lg);
+}
+
+/* Cards */
+.card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+    padding: var(--space-lg);
+    transition: all var(--transition-smooth);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.card-header {
+    border-bottom: 2px solid var(--color-1);
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: var(--space-md);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: var(--space-xs);
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 0.95rem 1.2rem;
+    border: 2px solid var(--color-2);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    transition: all var(--transition-base);
+    font-family: var(--font-family);
+    background: var(--color-1);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--color-5);
+    box-shadow: 0 0 0 4px rgba(99, 142, 203, 0.1);
+    background: white;
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Alerts */
+.alert {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    border-left: 4px solid;
+    font-size: var(--font-size-sm);
+}
+
+.alert-success {
+    background: var(--success-light);
+    color: var(--success);
+    border-color: var(--success);
+}
+
+.alert-error {
+    background: var(--error-light);
+    color: var(--error);
+    border-color: var(--error);
+}
+
+.alert-warning {
+    background: var(--warning-light);
+    color: var(--warning);
+    border-color: var(--warning);
+}
+
+.alert-info {
+    background: var(--info-light);
+    color: var(--info);
+    border-color: var(--info);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(60px, 60px) scale(1.1); }
+    66% { transform: translate(-60px, 80px) scale(0.9); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ================================
+   RESPONSIVE UTILITIES
+   ================================ */
+
+@media (max-width: 768px) {
+    :root {
+        --font-size-3xl: 1.75rem;
+        --font-size-4xl: 2rem;
+        --font-size-5xl: 2.5rem;
+        --space-xl: 2rem;
+        --space-2xl: 3rem;
+    }
+    
+    .btn {
+        padding: 0.65rem 1.5rem;
+    }
+    
+    .card {
+        padding: var(--space-md);
+    }
+}

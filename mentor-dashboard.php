@@ -1,0 +1,484 @@
+<?php
+// mentor-dashboard.php - Mentor Profile & Dashboard
+require_once 'config.php';
+requireRole('mentor');
+
+$pdo = getDB();
+$user_id = getUserId();
+
+// Get mentor profile
+$stmt = $pdo->prepare("
+    SELECT mp.*, u.email 
+    FROM mentor_profiles mp 
+    JOIN users u ON mp.user_id = u.id 
+    WHERE mp.user_id = ?
+");
+$stmt->execute([$user_id]);
+$profile = $stmt->fetch();
+
+// Get categories
+$categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
+
+// Get mentor's selected categories
+$stmt = $pdo->prepare("SELECT category_id FROM mentor_categories WHERE mentor_id = ?");
+$stmt->execute([$profile['id']]);
+$selected_categories = array_column($stmt->fetchAll(), 'category_id');
+
+$success = '';
+$error = '';
+
+// Handle profile update
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $full_name = sanitize($_POST['full_name']);
+    $bio = sanitize($_POST['bio']);
+    $skills = sanitize($_POST['skills']);
+    $experience = sanitize($_POST['experience']);
+    $hourly_rate = floatval($_POST['hourly_rate']);
+    $selected_cats = $_POST['categories'] ?? [];
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Handle profile image upload
+        $profile_image = $profile['profile_image'];
+        if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
+            $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+            $filename = $_FILES['profile_image']['name'];
+            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            
+            if (in_array($ext, $allowed)) {
+                $new_filename = 'mentor_' . $user_id . '_' . time() . '.' . $ext;
+                $upload_path = 'uploads/' . $new_filename;
+                
+                if (move_uploaded_file($_FILES['profile_image']['tmp_name'], $upload_path)) {
+                    $profile_image = $upload_path;
+                }
+            }
+        }
+        
+        // Update mentor profile
+        $stmt = $pdo->prepare("
+            UPDATE mentor_profiles 
+            SET full_name = ?, bio = ?, skills = ?, experience = ?, 
+                hourly_rate = ?, profile_image = ?
+            WHERE user_id = ?
+        ");
+        $stmt->execute([$full_name, $bio, $skills, $experience, $hourly_rate, $profile_image, $user_id]);
+        
+        // Update categories
+        $stmt = $pdo->prepare("DELETE FROM mentor_categories WHERE mentor_id = ?");
+        $stmt->execute([$profile['id']]);
+        
+        if (!empty($selected_cats)) {
+            $stmt = $pdo->prepare("INSERT INTO mentor_categories (mentor_id, category_id) VALUES (?, ?)");
+            foreach ($selected_cats as $cat_id) {
+                $stmt->execute([$profile['id'], $cat_id]);
+            }
+        }
+        
+        $pdo->commit();
+        $success = 'Profile updated successfully!';
+        
+        // Refresh profile
+        $stmt = $pdo->prepare("SELECT * FROM mentor_profiles WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $profile = $stmt->fetch();
+        
+        $stmt = $pdo->prepare("SELECT category_id FROM mentor_categories WHERE mentor_id = ?");
+        $stmt->execute([$profile['id']]);
+        $selected_categories = array_column($stmt->fetchAll(), 'category_id');
+        
+    } catch(PDOException $e) {
+        $pdo->rollBack();
+        $error = 'Update failed. Please try again.';
+    }
+}
+
+// Get mentor statistics
+$stmt = $pdo->prepare("SELECT COUNT(*) as total FROM sessions WHERE mentor_id = ? AND status = 'completed'");
+$stmt->execute([$profile['id']]);
+$stats = $stmt->fetch();
+$total_sessions = $stats['total'];
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Dashboard - MentorBridge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .status-banner {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+        }
+
+        .status-approved {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .status-rejected {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .category-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-checkbox:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .category-checkbox input[type="checkbox"]:checked + label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .category-checkbox input[type="checkbox"] {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .profile-image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #6ee7b7;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #fca5a5;
+        }
+
+        @media (max-width: 768px) {
+            .nav-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="logo">🎓 MentorBridge</div>
+        <div class="nav-buttons">
+            <span style="color: #666;">👤 <?php echo htmlspecialchars($profile['full_name']); ?></span>
+            <a href="logout.php" class="btn btn-secondary">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <?php if ($profile['status'] === 'pending'): ?>
+            <div class="status-banner status-pending">
+                ⏳ Your profile is pending admin approval. You'll be able to accept sessions once approved.
+            </div>
+        <?php elseif ($profile['status'] === 'approved'): ?>
+            <div class="status-banner status-approved">
+                ✅ Your profile is approved! You can now receive session bookings.
+            </div>
+        <?php elseif ($profile['status'] === 'rejected'): ?>
+            <div class="status-banner status-rejected">
+                ❌ Your profile was not approved. Please contact support for more information.
+            </div>
+        <?php endif; ?>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-value"><?php echo $total_sessions; ?></div>
+                <div class="stat-label">Completed Sessions</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-value"><?php echo number_format($profile['average_rating'], 1); ?></div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-value"><?php echo $profile['total_reviews']; ?></div>
+                <div class="stat-label">Total Reviews</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value">$<?php echo number_format($profile['hourly_rate'], 0); ?></div>
+                <div class="stat-label">Hourly Rate</div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h2>📝 Your Profile</h2>
+            
+            <?php if ($success): ?>
+                <div class="alert alert-success"><?php echo $success; ?></div>
+            <?php endif; ?>
+            
+            <?php if ($error): ?>
+                <div class="alert alert-error"><?php echo $error; ?></div>
+            <?php endif; ?>
+
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" value="<?php echo htmlspecialchars($profile['full_name']); ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Profile Image</label>
+                    <input type="file" name="profile_image" accept="image/*">
+                    <?php if ($profile['profile_image']): ?>
+                        <img src="<?php echo htmlspecialchars($profile['profile_image']); ?>" alt="Profile" class="profile-image-preview">
+                    <?php endif; ?>
+                </div>
+
+                <div class="form-group">
+                    <label>Bio (Tell students about yourself)</label>
+                    <textarea name="bio" required><?php echo htmlspecialchars($profile['bio']); ?></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Skills (Comma-separated)</label>
+                    <input type="text" name="skills" value="<?php echo htmlspecialchars($profile['skills']); ?>" placeholder="e.g., Python, Machine Learning, Web Development" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Experience</label>
+                    <textarea name="experience" placeholder="Describe your professional experience"><?php echo htmlspecialchars($profile['experience']); ?></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Hourly Rate ($)</label>
+                    <input type="number" name="hourly_rate" value="<?php echo $profile['hourly_rate']; ?>" min="0" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Categories (Select all that apply)</label>
+                    <div class="categories-grid">
+                        <?php foreach ($categories as $cat): ?>
+                            <div class="category-checkbox">
+                                <input type="checkbox" 
+                                       name="categories[]" 
+                                       value="<?php echo $cat['id']; ?>" 
+                                       id="cat_<?php echo $cat['id']; ?>"
+                                       <?php echo in_array($cat['id'], $selected_categories) ? 'checked' : ''; ?>>
+                                <label for="cat_<?php echo $cat['id']; ?>">
+                                    <?php echo $cat['icon'] . ' ' . htmlspecialchars($cat['name']); ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                    💾 Save Profile
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
