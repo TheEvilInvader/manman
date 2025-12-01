@@ -3,16 +3,20 @@
 require_once 'config.php';
 requireRole('mentee');
 
-$pdo = getDB();
+$mysqli = getDB();
 $user_id = getUserId();
 
 // Get mentee profile
-$stmt = $pdo->prepare("SELECT * FROM mentee_profiles WHERE user_id = ?");
-$stmt->execute([$user_id]);
-$mentee_profile = $stmt->fetch();
+$stmt = $mysqli->prepare("SELECT * FROM mentee_profiles WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$mentee_profile = $result->fetch_assoc();
+$stmt->close();
 
 // Get all categories
-$categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
+$result = $mysqli->query("SELECT * FROM categories ORDER BY name");
+$categories = $result->fetch_all(MYSQLI_ASSOC);
 
 // Get selected category
 $selected_category = $_GET['category'] ?? null;
@@ -31,16 +35,19 @@ if ($selected_category || $search_query) {
         WHERE mp.status = 'approved'
     ";
     
+    $types = "";
     $params = [];
     
     if ($selected_category) {
         $sql .= " AND mc.category_id = ?";
+        $types .= "i";
         $params[] = $selected_category;
     }
     
     if ($search_query) {
         $sql .= " AND (mp.full_name LIKE ? OR mp.skills LIKE ? OR mp.bio LIKE ?)";
         $search_param = '%' . $search_query . '%';
+        $types .= "sss";
         $params[] = $search_param;
         $params[] = $search_param;
         $params[] = $search_param;
@@ -48,10 +55,17 @@ if ($selected_category || $search_query) {
     
     $sql .= " GROUP BY mp.id ORDER BY mp.average_rating DESC, mp.total_reviews DESC";
     
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $mentors = $stmt->fetchAll();
+    $stmt = $mysqli->prepare($sql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $mentors = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
 }
+
+$mysqli->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
