@@ -3,26 +3,36 @@
 require_once 'config.php';
 requireRole('mentor');
 
-$pdo = getDB();
+$mysqli = getDB();
 $user_id = getUserId();
 
 // Get mentor profile
-$stmt = $pdo->prepare("
+$stmt = $mysqli->prepare("
     SELECT mp.*, u.email 
     FROM mentor_profiles mp 
     JOIN users u ON mp.user_id = u.id 
     WHERE mp.user_id = ?
 ");
-$stmt->execute([$user_id]);
-$profile = $stmt->fetch();
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$profile = $result->fetch_assoc();
+$stmt->close();
 
 // Get categories
-$categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
+$result = $mysqli->query("SELECT * FROM categories ORDER BY name");
+$categories = $result->fetch_all(MYSQLI_ASSOC);
 
 // Get mentor's selected categories
-$stmt = $pdo->prepare("SELECT category_id FROM mentor_categories WHERE mentor_id = ?");
-$stmt->execute([$profile['id']]);
-$selected_categories = array_column($stmt->fetchAll(), 'category_id');
+$stmt = $mysqli->prepare("SELECT category_id FROM mentor_categories WHERE mentor_id = ?");
+$stmt->bind_param("i", $profile['id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$selected_categories = [];
+while ($row = $result->fetch_assoc()) {
+    $selected_categories[] = $row['category_id'];
+}
+$stmt->close();
 
 $success = '';
 $error = '';
@@ -36,9 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hourly_rate = floatval($_POST['hourly_rate']);
     $selected_cats = $_POST['categories'] ?? [];
     
+    $mysqli->begin_transaction();
+    
     try {
-        $pdo->beginTransaction();
-        
         // Handle profile image upload
         $profile_image = $profile['profile_image'];
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
@@ -57,48 +67,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Update mentor profile
-        $stmt = $pdo->prepare("
+        $stmt = $mysqli->prepare("
             UPDATE mentor_profiles 
             SET full_name = ?, bio = ?, skills = ?, experience = ?, 
                 hourly_rate = ?, profile_image = ?
             WHERE user_id = ?
         ");
-        $stmt->execute([$full_name, $bio, $skills, $experience, $hourly_rate, $profile_image, $user_id]);
+        $stmt->bind_param("ssssdsi", $full_name, $bio, $skills, $experience, $hourly_rate, $profile_image, $user_id);
+        $stmt->execute();
+        $stmt->close();
         
         // Update categories
-        $stmt = $pdo->prepare("DELETE FROM mentor_categories WHERE mentor_id = ?");
-        $stmt->execute([$profile['id']]);
+        $stmt = $mysqli->prepare("DELETE FROM mentor_categories WHERE mentor_id = ?");
+        $stmt->bind_param("i", $profile['id']);
+        $stmt->execute();
+        $stmt->close();
         
         if (!empty($selected_cats)) {
-            $stmt = $pdo->prepare("INSERT INTO mentor_categories (mentor_id, category_id) VALUES (?, ?)");
+            $stmt = $mysqli->prepare("INSERT INTO mentor_categories (mentor_id, category_id) VALUES (?, ?)");
             foreach ($selected_cats as $cat_id) {
-                $stmt->execute([$profile['id'], $cat_id]);
+                $stmt->bind_param("ii", $profile['id'], $cat_id);
+                $stmt->execute();
             }
+            $stmt->close();
         }
         
-        $pdo->commit();
+        $mysqli->commit();
         $success = 'Profile updated successfully!';
         
         // Refresh profile
-        $stmt = $pdo->prepare("SELECT * FROM mentor_profiles WHERE user_id = ?");
-        $stmt->execute([$user_id]);
-        $profile = $stmt->fetch();
+        $stmt = $mysqli->prepare("SELECT * FROM mentor_profiles WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $profile = $result->fetch_assoc();
+        $stmt->close();
         
-        $stmt = $pdo->prepare("SELECT category_id FROM mentor_categories WHERE mentor_id = ?");
-        $stmt->execute([$profile['id']]);
-        $selected_categories = array_column($stmt->fetchAll(), 'category_id');
+        $stmt = $mysqli->prepare("SELECT category_id FROM mentor_categories WHERE mentor_id = ?");
+        $stmt->bind_param("i", $profile['id']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $selected_categories = [];
+        while ($row = $result->fetch_assoc()) {
+            $selected_categories[] = $row['category_id'];
+        }
+        $stmt->close();
         
-    } catch(PDOException $e) {
-        $pdo->rollBack();
+    } catch(Exception $e) {
+        $mysqli->rollback();
         $error = 'Update failed. Please try again.';
     }
 }
 
 // Get mentor statistics
-$stmt = $pdo->prepare("SELECT COUNT(*) as total FROM sessions WHERE mentor_id = ? AND status = 'completed'");
-$stmt->execute([$profile['id']]);
-$stats = $stmt->fetch();
+$stmt = $mysqli->prepare("SELECT COUNT(*) as total FROM sessions WHERE mentor_id = ? AND status = 'completed'");
+$stmt->bind_param("i", $profile['id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$stats = $result->fetch_assoc();
 $total_sessions = $stats['total'];
+$stmt->close();
+$mysqli->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
