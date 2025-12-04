@@ -3,11 +3,11 @@
 require_once 'config.php';
 requireRole('mentee');
 
-$pdo = getDB();
-$mentor_id = $_GET['id'] ?? 0;
+$mysqli = getDB();
+$mentor_id = intval($_GET['id'] ?? 0);
 
 // Get mentor details
-$stmt = $pdo->prepare("
+$stmt = $mysqli->prepare("
     SELECT mp.*, 
            GROUP_CONCAT(DISTINCT c.name) as category_names,
            GROUP_CONCAT(DISTINCT c.icon) as category_icons
@@ -17,15 +17,18 @@ $stmt = $pdo->prepare("
     WHERE mp.id = ? AND mp.status = 'approved'
     GROUP BY mp.id
 ");
-$stmt->execute([$mentor_id]);
-$mentor = $stmt->fetch();
+$stmt->bind_param("i", $mentor_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$mentor = $result->fetch_assoc();
+$stmt->close();
 
 if (!$mentor) {
     redirect('mentee-dashboard.php');
 }
 
 // Get feedback/reviews
-$stmt = $pdo->prepare("
+$stmt = $mysqli->prepare("
     SELECT f.*, mp.full_name as mentee_name, s.scheduled_at
     FROM feedback f
     JOIN sessions s ON f.session_id = s.id
@@ -34,17 +37,32 @@ $stmt = $pdo->prepare("
     ORDER BY f.created_at DESC
     LIMIT 10
 ");
-$stmt->execute([$mentor_id]);
-$reviews = $stmt->fetchAll();
+$stmt->bind_param("i", $mentor_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$reviews = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 
-// Get available time slots (example - in production you'd have actual schedule)
-$available_times = [
-    'Monday' => ['09:00', '10:00', '14:00', '15:00'],
-    'Tuesday' => ['09:00', '10:00', '14:00', '15:00'],
-    'Wednesday' => ['09:00', '10:00', '14:00', '15:00'],
-    'Thursday' => ['09:00', '10:00', '14:00', '15:00'],
-    'Friday' => ['09:00', '10:00', '14:00', '15:00'],
-];
+// Get available time slots from database
+$stmt = $mysqli->prepare("
+    SELECT day_of_week, TIME_FORMAT(time_slot, '%H:%i') as time_slot
+    FROM mentor_availability
+    WHERE mentor_id = ? AND is_available = 1
+    ORDER BY FIELD(day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), time_slot
+");
+$stmt->bind_param("i", $mentor_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$availability = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+
+// Organize by day
+$available_times = [];
+foreach ($availability as $slot) {
+    $available_times[$slot['day_of_week']][] = $slot['time_slot'];
+}
+
+$mysqli->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -413,14 +431,19 @@ $available_times = [
                         </div>
                         <div class="category-badges">
                             <?php 
-                            $cat_names = explode(',', $mentor['category_names']);
-                            $cat_icons = explode(',', $mentor['category_icons']);
-                            for ($i = 0; $i < count($cat_names); $i++): 
+                            if (!empty($mentor['category_names'])) {
+                                $cat_names = explode(',', $mentor['category_names']);
+                                $cat_icons = !empty($mentor['category_icons']) ? explode(',', $mentor['category_icons']) : [];
+                                for ($i = 0; $i < count($cat_names); $i++): 
+                                    $icon = $cat_icons[$i] ?? '📚';
                             ?>
                                 <span class="category-badge">
-                                    <?php echo $cat_icons[$i] . ' ' . $cat_names[$i]; ?>
+                                    <?php echo $icon . ' ' . trim($cat_names[$i]); ?>
                                 </span>
-                            <?php endfor; ?>
+                            <?php 
+                                endfor;
+                            }
+                            ?>
                         </div>
                         <div class="hourly-rate-large">
                             $<?php echo number_format($mentor['hourly_rate'], 0); ?>/hour
@@ -487,18 +510,29 @@ $available_times = [
                     
                     <div class="time-slots">
                         <p style="color: #666; margin-bottom: 1rem;">Select a date and time:</p>
-                        <?php foreach ($available_times as $day => $times): ?>
-                            <div class="day-section">
-                                <div class="day-name"><?php echo $day; ?></div>
-                                <div class="time-buttons">
-                                    <?php foreach ($times as $time): ?>
-                                        <button type="button" class="time-btn" onclick="selectTime(this, '<?php echo $day; ?>', '<?php echo $time; ?>')">
-                                            <?php echo $time; ?>
-                                        </button>
-                                    <?php endforeach; ?>
-                                </div>
+                        <?php if (empty($available_times)): ?>
+                            <div style="text-align: center; padding: 2rem; color: #999;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
+                                <p>No available time slots at the moment.</p>
+                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Please check back later.</p>
                             </div>
-                        <?php endforeach; ?>
+                        <?php else: ?>
+                            <?php foreach ($available_times as $day => $times): ?>
+                                <div class="day-section">
+                                    <div class="day-name"><?php echo $day; ?></div>
+                                    <div class="time-buttons">
+                                        <?php foreach ($times as $time): 
+                                            $end_hour = intval(substr($time, 0, 2)) + 1;
+                                            $end_time = str_pad($end_hour, 2, '0', STR_PAD_LEFT) . substr($time, 2);
+                                        ?>
+                                            <button type="button" class="time-btn" onclick="selectTime(this, '<?php echo $day; ?>', '<?php echo $time; ?>')">
+                                                <?php echo $time . ' - ' . $end_time; ?>
+                                            </button>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
 
                     <input type="hidden" name="selected_day" id="selected_day">

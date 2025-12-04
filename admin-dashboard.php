@@ -3,7 +3,7 @@
 require_once 'config.php';
 requireRole('admin');
 
-$pdo = getDB();
+$mysqli = getDB();
 
 // Handle mentor approval/rejection
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -11,48 +11,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
     
     if ($action === 'approve') {
-        $stmt = $pdo->prepare("UPDATE mentor_profiles SET status = 'approved' WHERE id = ?");
-        $stmt->execute([$mentor_id]);
+        $stmt = $mysqli->prepare("UPDATE mentor_profiles SET status = 'approved' WHERE id = ?");
+        $stmt->bind_param("i", $mentor_id);
+        $stmt->execute();
+        $stmt->close();
         $success = 'Mentor approved successfully!';
     } elseif ($action === 'reject') {
-        $stmt = $pdo->prepare("UPDATE mentor_profiles SET status = 'rejected' WHERE id = ?");
-        $stmt->execute([$mentor_id]);
+        $stmt = $mysqli->prepare("UPDATE mentor_profiles SET status = 'rejected' WHERE id = ?");
+        $stmt->bind_param("i", $mentor_id);
+        $stmt->execute();
+        $stmt->close();
         $success = 'Mentor rejected.';
     } elseif ($action === 'suspend_user') {
         $user_id = intval($_POST['user_id']);
-        $stmt = $pdo->prepare("UPDATE users SET status = 'suspended' WHERE id = ?");
-        $stmt->execute([$user_id]);
+        $stmt = $mysqli->prepare("UPDATE users SET status = 'suspended' WHERE id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $stmt->close();
         $success = 'User suspended.';
     } elseif ($action === 'activate_user') {
         $user_id = intval($_POST['user_id']);
-        $stmt = $pdo->prepare("UPDATE users SET status = 'active' WHERE id = ?");
-        $stmt->execute([$user_id]);
+        $stmt = $mysqli->prepare("UPDATE users SET status = 'active' WHERE id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $stmt->close();
         $success = 'User activated.';
     }
 }
 
 // Get statistics
-$stats = [
-    'total_users' => $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn(),
-    'total_mentors' => $pdo->query("SELECT COUNT(*) FROM mentor_profiles WHERE status = 'approved'")->fetchColumn(),
-    'total_mentees' => $pdo->query("SELECT COUNT(*) FROM mentee_profiles")->fetchColumn(),
-    'total_sessions' => $pdo->query("SELECT COUNT(*) FROM sessions")->fetchColumn(),
-    'completed_sessions' => $pdo->query("SELECT COUNT(*) FROM sessions WHERE status = 'completed'")->fetchColumn(),
-    'pending_mentors' => $pdo->query("SELECT COUNT(*) FROM mentor_profiles WHERE status = 'pending'")->fetchColumn(),
-    'total_revenue' => $pdo->query("SELECT SUM(amount) FROM sessions WHERE payment_status = 'paid'")->fetchColumn() ?? 0,
-];
+$stats = [];
 
-// Get pending mentors
-$pending_mentors = $pdo->query("
-    SELECT mp.*, u.email, u.created_at as registration_date
+$result = $mysqli->query("SELECT COUNT(*) as count FROM users");
+$row = $result->fetch_assoc();
+$stats['total_users'] = $row['count'];
+
+$result = $mysqli->query("SELECT COUNT(*) as count FROM mentor_profiles WHERE status = 'approved'");
+$row = $result->fetch_assoc();
+$stats['total_mentors'] = $row['count'];
+
+$result = $mysqli->query("SELECT COUNT(*) as count FROM mentee_profiles");
+$row = $result->fetch_assoc();
+$stats['total_mentees'] = $row['count'];
+
+$result = $mysqli->query("SELECT COUNT(*) as count FROM sessions");
+$row = $result->fetch_assoc();
+$stats['total_sessions'] = $row['count'];
+
+$result = $mysqli->query("SELECT COUNT(*) as count FROM sessions WHERE status = 'completed'");
+$row = $result->fetch_assoc();
+$stats['completed_sessions'] = $row['count'];
+
+$result = $mysqli->query("SELECT COUNT(*) as count FROM mentor_profiles WHERE status = 'pending'");
+$row = $result->fetch_assoc();
+$stats['pending_mentors'] = $row['count'];
+
+$result = $mysqli->query("SELECT SUM(amount) as total FROM sessions WHERE payment_status = 'paid'");
+$row = $result->fetch_assoc();
+$stats['total_revenue'] = $row['total'] ?? 0;
+
+// Get pending mentors with categories
+$result = $mysqli->query("
+    SELECT mp.*, u.email, u.created_at as registration_date,
+           GROUP_CONCAT(c.name SEPARATOR ', ') as categories
     FROM mentor_profiles mp 
     JOIN users u ON mp.user_id = u.id 
+    LEFT JOIN mentor_categories mc ON mp.id = mc.mentor_id
+    LEFT JOIN categories c ON mc.category_id = c.id
     WHERE mp.status = 'pending' 
+    GROUP BY mp.id
     ORDER BY mp.created_at DESC
-")->fetchAll();
+");
+$pending_mentors = $result->fetch_all(MYSQLI_ASSOC);
 
 // Get recent users
-$recent_users = $pdo->query("
+$result = $mysqli->query("
     SELECT u.*, 
            CASE 
                WHEN u.role = 'mentor' THEN mp.full_name
@@ -64,10 +97,11 @@ $recent_users = $pdo->query("
     LEFT JOIN mentee_profiles mep ON u.id = mep.user_id
     ORDER BY u.created_at DESC
     LIMIT 10
-")->fetchAll();
+");
+$recent_users = $result->fetch_all(MYSQLI_ASSOC);
 
 // Get recent sessions
-$recent_sessions = $pdo->query("
+$result = $mysqli->query("
     SELECT s.*, 
            m.full_name as mentor_name,
            me.full_name as mentee_name
@@ -76,20 +110,22 @@ $recent_sessions = $pdo->query("
     JOIN mentee_profiles me ON s.mentee_id = me.id
     ORDER BY s.created_at DESC
     LIMIT 10
-")->fetchAll();
+");
+$recent_sessions = $result->fetch_all(MYSQLI_ASSOC);
 
 // Get top mentors
-$top_mentors = $pdo->query("
+$result = $mysqli->query("
     SELECT mp.*, 
            COUNT(s.id) as session_count,
-           SUM(s.amount) as total_earnings
+           COALESCE(SUM(s.amount), 0) as total_earnings
     FROM mentor_profiles mp
     LEFT JOIN sessions s ON mp.id = s.mentor_id AND s.payment_status = 'paid'
     WHERE mp.status = 'approved'
     GROUP BY mp.id
     ORDER BY total_earnings DESC
     LIMIT 5
-")->fetchAll();
+");
+$top_mentors = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,7 +133,24 @@ $top_mentors = $pdo->query("
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - MentorBridge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --color-primary: #638ECB;
+            --color-primary-dark: #395886;
+            --color-primary-light: #8AAEE0;
+            --color-accent: #B1C9EF;
+            --color-bg-light: #F0F3FA;
+            --color-bg-lighter: #D5DEEF;
+            --color-success: #10b981;
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+            --color-text: #1e293b;
+            --color-text-light: #64748b;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -105,29 +158,47 @@ $top_mentors = $pdo->query("
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
             min-height: 100vh;
             padding: 20px;
+            color: var(--color-text);
         }
 
         .nav-bar {
             background: white;
-            padding: 1rem 2rem;
-            border-radius: 15px;
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.15);
+            border: 1px solid rgba(99, 142, 203, 0.1);
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
         .container {
@@ -145,63 +216,94 @@ $top_mentors = $pdo->query("
         .stat-card {
             background: white;
             padding: 2rem;
-            border-radius: 15px;
+            border-radius: 20px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(99, 142, 203, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+            transform: scaleX(0);
             transition: transform 0.3s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(99, 142, 203, 0.15);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
         }
 
         .stat-icon {
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
+            filter: grayscale(0.2);
         }
 
         .stat-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
+            line-height: 1;
+            letter-spacing: -1px;
         }
 
         .stat-label {
-            color: #666;
-            font-size: 0.95rem;
+            color: var(--color-text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .section {
             background: white;
-            padding: 2rem;
-            border-radius: 15px;
+            padding: 2.5rem;
+            border-radius: 20px;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.08);
+            border: 1px solid rgba(99, 142, 203, 0.1);
         }
 
         .section h2 {
-            color: #667eea;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
+            color: var(--color-primary-dark);
+            margin-bottom: 2rem;
+            font-size: 1.75rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            letter-spacing: -0.5px;
         }
 
         .mentor-item {
-            border: 2px solid #f0f0f0;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
+            border: 2px solid var(--color-bg-lighter);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
             transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(240, 243, 250, 0.3), rgba(255, 255, 255, 0.9));
         }
 
         .mentor-item:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+            border-color: var(--color-primary-light);
+            box-shadow: 0 8px 30px rgba(99, 142, 203, 0.15);
+            transform: translateY(-2px);
         }
 
         .mentor-header {
@@ -212,95 +314,114 @@ $top_mentors = $pdo->query("
         }
 
         .mentor-info h3 {
-            color: #333;
+            color: var(--color-primary-dark);
             margin-bottom: 0.5rem;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 700;
         }
 
         .mentor-email {
-            color: #666;
-            font-size: 0.9rem;
+            color: var(--color-text-light);
+            font-size: 0.95rem;
             margin-bottom: 0.5rem;
+            font-weight: 500;
         }
 
         .mentor-meta {
-            color: #999;
-            font-size: 0.85rem;
+            color: var(--color-text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .mentor-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         .btn {
-            padding: 0.6rem 1.2rem;
+            padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-approve {
-            background: #10b981;
+            background: linear-gradient(135deg, var(--color-success), #059669);
             color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
         .btn-approve:hover {
-            background: #059669;
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.4);
             transform: translateY(-2px);
         }
 
         .btn-reject {
-            background: #ef4444;
+            background: linear-gradient(135deg, var(--color-danger), #dc2626);
             color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
 
         .btn-reject:hover {
-            background: #dc2626;
+            box-shadow: 0 6px 25px rgba(239, 68, 68, 0.4);
             transform: translateY(-2px);
         }
 
         .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
+            background: var(--color-bg-light);
+            color: var(--color-primary-dark);
+            font-weight: 600;
+            border: 2px solid transparent;
         }
 
         .btn-secondary:hover {
-            background: #e0e0e0;
+            background: white;
+            border-color: var(--color-primary-light);
+            transform: translateY(-2px);
         }
 
         .btn-suspend {
-            background: #f59e0b;
+            background: var(--color-warning);
             color: white;
             font-size: 0.85rem;
-            padding: 0.4rem 0.8rem;
+            padding: 0.5rem 1rem;
         }
 
         .btn-activate {
-            background: #10b981;
+            background: var(--color-success);
             color: white;
             font-size: 0.85rem;
-            padding: 0.4rem 0.8rem;
+            padding: 0.5rem 1rem;
         }
 
         .mentor-details {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
+            background: var(--color-bg-light);
+            padding: 1.5rem;
+            border-radius: 12px;
             margin-top: 1rem;
         }
 
         .detail-row {
-            margin-bottom: 0.5rem;
-            color: #666;
+            margin-bottom: 1rem;
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
         }
 
         .detail-row strong {
-            color: #333;
+            color: var(--color-primary-dark);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
         }
 
         .skills-tags {
@@ -311,18 +432,36 @@ $top_mentors = $pdo->query("
         }
 
         .skill-tag {
-            background: #e0e7ff;
-            color: #667eea;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
+            background: var(--color-accent);
+            color: var(--color-primary-dark);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
             font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .category-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .category-tag {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
         .alert {
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 1.25rem;
+            border-radius: 12px;
             margin-bottom: 1.5rem;
             animation: slideDown 0.3s ease;
+            font-weight: 500;
         }
 
         @keyframes slideDown {
@@ -348,28 +487,30 @@ $top_mentors = $pdo->query("
         }
 
         th {
-            background: #f8f9fa;
+            background: var(--color-bg-light);
             padding: 1rem;
             text-align: left;
-            color: #667eea;
+            color: var(--color-primary-dark);
             font-weight: 600;
+            border-bottom: 2px solid var(--color-bg-lighter);
         }
 
         td {
             padding: 1rem;
-            border-bottom: 1px solid #f0f0f0;
-            color: #666;
+            border-bottom: 1px solid var(--color-bg-light);
+            color: var(--color-text);
         }
 
         tr:hover {
-            background: #f8f9fa;
+            background: var(--color-bg-light);
         }
 
         .status-badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
+            display: inline-block;
         }
 
         .status-active {
@@ -399,9 +540,11 @@ $top_mentors = $pdo->query("
 
         .tabs {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             margin-bottom: 2rem;
-            border-bottom: 2px solid #f0f0f0;
+            background: var(--color-bg-light);
+            padding: 0.5rem;
+            border-radius: 16px;
         }
 
         .tab {
@@ -409,24 +552,22 @@ $top_mentors = $pdo->query("
             cursor: pointer;
             border: none;
             background: none;
-            color: #666;
+            color: var(--color-text-light);
             font-weight: 600;
             position: relative;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.5);
         }
 
         .tab.active {
-            color: #667eea;
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            box-shadow: 0 4px 15px rgba(99, 142, 203, 0.3);
         }
 
         .tab-content {
@@ -435,12 +576,30 @@ $top_mentors = $pdo->query("
 
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .no-data {
             text-align: center;
             padding: 3rem;
-            color: #999;
+            color: var(--color-text-light);
+        }
+
+        .no-data-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
         @media (max-width: 768px) {
@@ -468,18 +627,29 @@ $top_mentors = $pdo->query("
             th, td {
                 padding: 0.5rem;
             }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <nav class="nav-bar">
-        <div class="logo">🎓 MentorBridge - Admin Panel</div>
-        <a href="logout.php" class="btn btn-secondary">Logout</a>
+        <div class="logo">MentorBridge</div>
+        <div class="nav-actions">
+            <span class="admin-badge">Admin Panel</span>
+            <a href="logout.php" class="btn btn-secondary">Logout</a>
+        </div>
     </nav>
 
     <div class="container">
         <?php if (isset($success)): ?>
-            <div class="alert alert-success">✓ <?php echo $success; ?></div>
+            <div class="alert alert-success"><?php echo $success; ?></div>
         <?php endif; ?>
 
         <!-- Statistics Dashboard -->
@@ -512,7 +682,7 @@ $top_mentors = $pdo->query("
             <div class="stat-card">
                 <div class="stat-icon">⏳</div>
                 <div class="stat-value"><?php echo number_format($stats['pending_mentors']); ?></div>
-                <div class="stat-label">Pending Approvals</div>
+                <div class="stat-label">Pending</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">💰</div>
@@ -523,19 +693,19 @@ $top_mentors = $pdo->query("
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('pending')">⏳ Pending Approvals (<?php echo count($pending_mentors); ?>)</button>
-            <button class="tab" onclick="switchTab('users')">👥 Users</button>
-            <button class="tab" onclick="switchTab('sessions')">📅 Sessions</button>
-            <button class="tab" onclick="switchTab('topmentors')">⭐ Top Mentors</button>
+            <button class="tab active" onclick="switchTab('pending')">Pending Approvals (<?php echo count($pending_mentors); ?>)</button>
+            <button class="tab" onclick="switchTab('users')">Users</button>
+            <button class="tab" onclick="switchTab('sessions')">Sessions</button>
+            <button class="tab" onclick="switchTab('topmentors')">Top Mentors</button>
         </div>
 
         <!-- Pending Mentors Tab -->
         <div id="tab-pending" class="tab-content active">
             <div class="section">
-                <h2>⏳ Pending Mentor Approvals</h2>
+                <h2>Pending Mentor Approvals</h2>
                 <?php if (empty($pending_mentors)): ?>
                     <div class="no-data">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+                        <div class="no-data-icon">✅</div>
                         <p>No pending approvals! All mentors have been reviewed.</p>
                     </div>
                 <?php else: ?>
@@ -544,36 +714,46 @@ $top_mentors = $pdo->query("
                             <div class="mentor-header">
                                 <div class="mentor-info">
                                     <h3><?php echo htmlspecialchars($mentor['full_name']); ?></h3>
-                                    <div class="mentor-email">📧 <?php echo htmlspecialchars($mentor['email']); ?></div>
+                                    <div class="mentor-email"><?php echo htmlspecialchars($mentor['email']); ?></div>
                                     <div class="mentor-meta">
-                                        📅 Registered: <?php echo date('M d, Y', strtotime($mentor['registration_date'])); ?> | 
-                                        💰 Rate: $<?php echo number_format($mentor['hourly_rate'], 2); ?>/hour
+                                        Registered: <?php echo date('M d, Y', strtotime($mentor['registration_date'])); ?> | 
+                                        Rate: $<?php echo number_format($mentor['hourly_rate'], 2); ?>/hour
                                     </div>
+                                    <?php if (!empty($mentor['categories'])): ?>
+                                        <div class="category-tags">
+                                            <?php 
+                                            $categories = explode(', ', $mentor['categories']);
+                                            foreach ($categories as $category): 
+                                            ?>
+                                                <span class="category-tag"><?php echo htmlspecialchars($category); ?></span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="mentor-actions">
                                     <form method="POST" style="display: inline;">
                                         <input type="hidden" name="mentor_id" value="<?php echo $mentor['id']; ?>">
                                         <input type="hidden" name="action" value="approve">
-                                        <button type="submit" class="btn btn-approve">✓ Approve</button>
+                                        <button type="submit" class="btn btn-approve">Approve</button>
                                     </form>
                                     <form method="POST" style="display: inline;">
                                         <input type="hidden" name="mentor_id" value="<?php echo $mentor['id']; ?>">
                                         <input type="hidden" name="action" value="reject">
-                                        <button type="submit" class="btn btn-reject">✗ Reject</button>
+                                        <button type="submit" class="btn btn-reject">Reject</button>
                                     </form>
                                 </div>
                             </div>
                             <div class="mentor-details">
                                 <div class="detail-row">
-                                    <strong>Bio:</strong><br>
+                                    <strong>Bio</strong>
                                     <?php echo nl2br(htmlspecialchars($mentor['bio'])); ?>
                                 </div>
                                 <div class="detail-row">
-                                    <strong>Experience:</strong><br>
+                                    <strong>Experience</strong>
                                     <?php echo nl2br(htmlspecialchars($mentor['experience'])); ?>
                                 </div>
                                 <div class="detail-row">
-                                    <strong>Skills:</strong>
+                                    <strong>Skills</strong>
                                     <div class="skills-tags">
                                         <?php 
                                         $skills = explode(',', $mentor['skills']);
@@ -593,7 +773,7 @@ $top_mentors = $pdo->query("
         <!-- Users Tab -->
         <div id="tab-users" class="tab-content">
             <div class="section">
-                <h2>👥 Recent Users</h2>
+                <h2>Recent Users</h2>
                 <table>
                     <thead>
                         <tr>
@@ -647,7 +827,7 @@ $top_mentors = $pdo->query("
         <!-- Sessions Tab -->
         <div id="tab-sessions" class="tab-content">
             <div class="section">
-                <h2>📅 Recent Sessions</h2>
+                <h2>Recent Sessions</h2>
                 <table>
                     <thead>
                         <tr>
@@ -688,9 +868,12 @@ $top_mentors = $pdo->query("
         <!-- Top Mentors Tab -->
         <div id="tab-topmentors" class="tab-content">
             <div class="section">
-                <h2>⭐ Top Performing Mentors</h2>
+                <h2>Top Performing Mentors</h2>
                 <?php if (empty($top_mentors)): ?>
-                    <div class="no-data">No mentors yet</div>
+                    <div class="no-data">
+                        <div class="no-data-icon">🏆</div>
+                        <p>No mentor data available yet</p>
+                    </div>
                 <?php else: ?>
                     <?php foreach ($top_mentors as $index => $mentor): ?>
                         <div class="mentor-item">
@@ -704,16 +887,16 @@ $top_mentors = $pdo->query("
                                         ?>
                                     </h3>
                                     <div class="mentor-meta">
-                                        ⭐ Rating: <?php echo number_format($mentor['average_rating'], 1); ?> 
+                                        Rating: <?php echo number_format($mentor['average_rating'], 1); ?> 
                                         (<?php echo $mentor['total_reviews']; ?> reviews) | 
-                                        📅 Sessions: <?php echo $mentor['session_count']; ?> | 
-                                        💰 Earned: $<?php echo number_format($mentor['total_earnings'], 2); ?>
+                                        Sessions: <?php echo $mentor['session_count']; ?> | 
+                                        Earned: $<?php echo number_format($mentor['total_earnings'], 2); ?>
                                     </div>
                                 </div>
                             </div>
                             <div class="mentor-details">
                                 <div class="detail-row">
-                                    <strong>Skills:</strong>
+                                    <strong>Skills</strong>
                                     <div class="skills-tags">
                                         <?php 
                                         $skills = explode(',', $mentor['skills']);

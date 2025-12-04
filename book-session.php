@@ -3,32 +3,45 @@
 require_once 'config.php';
 requireRole('mentee');
 
-$pdo = getDB();
+$mysqli = getDB();
 $user_id = getUserId();
 
 // Get mentee profile
-$stmt = $pdo->prepare("SELECT * FROM mentee_profiles WHERE user_id = ?");
-$stmt->execute([$user_id]);
-$mentee_profile = $stmt->fetch();
+$stmt = $mysqli->prepare("SELECT * FROM mentee_profiles WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$mentee_profile = $result->fetch_assoc();
+$stmt->close();
+
+if (!$mentee_profile) {
+    $_SESSION['error'] = 'Please complete your profile first';
+    redirect('mentee-dashboard.php');
+}
 
 $success = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $mentor_id = intval($_POST['mentor_id']);
-    $selected_day = sanitize($_POST['selected_day']);
-    $selected_time = sanitize($_POST['selected_time']);
+    $mentor_id = intval($_POST['mentor_id'] ?? 0);
+    $selected_day = sanitize($_POST['selected_day'] ?? '');
+    $selected_time = sanitize($_POST['selected_time'] ?? '');
     
     if (empty($selected_day) || empty($selected_time)) {
-        $error = 'Please select a date and time';
+        $_SESSION['error'] = 'Please select a date and time';
+        redirect('metnor-detail.php?id=' . $mentor_id);
     } else {
         // Get mentor details
-        $stmt = $pdo->prepare("SELECT * FROM mentor_profiles WHERE id = ?");
-        $stmt->execute([$mentor_id]);
-        $mentor = $stmt->fetch();
+        $stmt = $mysqli->prepare("SELECT * FROM mentor_profiles WHERE id = ?");
+        $stmt->bind_param("i", $mentor_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $mentor = $result->fetch_assoc();
+        $stmt->close();
         
         if (!$mentor) {
-            $error = 'Mentor not found';
+            $_SESSION['error'] = 'Mentor not found';
+            redirect('mentee-dashboard.php');
         } else {
             // Calculate next occurrence of selected day
             $days_map = [
@@ -49,14 +62,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $scheduled_date = date('Y-m-d', strtotime("+$days_ahead days"));
             $scheduled_datetime = $scheduled_date . ' ' . $selected_time . ':00';
             
-            try {
-                // Create session
-                $stmt = $pdo->prepare("
-                    INSERT INTO sessions (mentor_id, mentee_id, scheduled_at, amount, status, payment_status)
-                    VALUES (?, ?, ?, ?, 'pending', 'pending')
+            // Create session
+            $status = 'pending';
+            $payment_status = 'pending';
+            $stmt = $mysqli->prepare("
+                INSERT INTO sessions (mentor_id, mentee_id, scheduled_at, amount, status, payment_status)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->bind_param("iisdss", $mentor_id, $mentee_profile['id'], $scheduled_datetime, $mentor['hourly_rate'], $status, $payment_status);
+            
+            if ($stmt->execute()) {
+                $session_id = $mysqli->insert_id;
+                $stmt->close();
+                
+                // Mark the time slot as unavailable
+                $stmt = $mysqli->prepare("
+                    UPDATE mentor_availability 
+                    SET is_available = 0 
+                    WHERE mentor_id = ? AND day_of_week = ? AND time_slot = ?
                 ");
-                $stmt->execute([$mentor_id, $mentee_profile['id'], $scheduled_datetime, $mentor['hourly_rate']]);
-                $session_id = $pdo->lastInsertId();
+                $time_slot_formatted = $selected_time . ':00';
+                $stmt->bind_param("iss", $mentor_id, $selected_day, $time_slot_formatted);
+                $stmt->execute();
+                $stmt->close();
                 
                 // Store session info in session for payment page
                 $_SESSION['pending_booking'] = [
@@ -67,19 +95,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ];
                 
                 redirect('payment.php?session_id=' . $session_id);
-            } catch(PDOException $e) {
-                $error = 'Booking failed. Please try again.';
+            } else {
+                $stmt->close();
+                $_SESSION['error'] = 'Booking failed: ' . $mysqli->error;
+                redirect('metnor-detail.php?id=' . $mentor_id);
             }
         }
     }
 }
 
 // If GET request with mentor_id, show form
-$mentor_id = $_GET['mentor_id'] ?? 0;
+$mentor_id = intval($_GET['mentor_id'] ?? 0);
 if ($mentor_id) {
-    $stmt = $pdo->prepare("SELECT * FROM mentor_profiles WHERE id = ?");
-    $stmt->execute([$mentor_id]);
-    $mentor = $stmt->fetch();
+    $stmt = $mysqli->prepare("SELECT * FROM mentor_profiles WHERE id = ?");
+    $stmt->bind_param("i", $mentor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $mentor = $result->fetch_assoc();
+    $stmt->close();
 }
 ?>
 <!DOCTYPE html>

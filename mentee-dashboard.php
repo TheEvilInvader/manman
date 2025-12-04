@@ -413,6 +413,12 @@ $mysqli->close();
     </nav>
 
     <div class="container">
+        <?php if (isset($_SESSION['error'])): ?>
+            <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+        
         <div class="hero-section">
             <h1>Find Your Perfect Mentor</h1>
             <p>Connect with expert mentors in any field</p>
@@ -467,7 +473,7 @@ $mysqli->close();
             <?php else: ?>
                 <div class="mentors-grid">
                     <?php foreach ($mentors as $mentor): ?>
-                        <div class="mentor-card" onclick="window.location='mentor-detail.php?id=<?php echo $mentor['id']; ?>'">
+                        <div class="mentor-card" onclick="window.location='metnor-detail.php?id=<?php echo $mentor['id']; ?>'">
                             <div class="mentor-header">
                                 <div class="mentor-avatar">
                                     <?php if ($mentor['profile_image']): ?>
@@ -518,7 +524,7 @@ $mysqli->close();
                                 <div class="hourly-rate">
                                     $<?php echo number_format($mentor['hourly_rate'], 0); ?>/hour
                                 </div>
-                                <a href="mentor-detail.php?id=<?php echo $mentor['id']; ?>" class="btn-view" onclick="event.stopPropagation()">
+                                <a href="metnor-detail.php?id=<?php echo $mentor['id']; ?>" class="btn-view" onclick="event.stopPropagation()">
                                     View Profile →
                                 </a>
                             </div>

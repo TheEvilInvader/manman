@@ -440,6 +440,12 @@ $mysqli->close();
             </div>
         </div>
 
+        <div class="profile-card" style="background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary)); color: white; text-align: center;">
+            <h2 style="color: white; margin-bottom: 1rem;">🕐 Manage Your Availability</h2>
+            <p style="margin-bottom: 1.5rem; opacity: 0.9;">Control when mentees can book sessions with you by adding or removing time slots</p>
+            <a href="manage-availability.php" class="btn btn-secondary" style="background: white; color: var(--color-primary-dark); font-weight: 700;">Manage Time Slots</a>
+        </div>
+
         <div class="profile-card">
             <h2>📝 Your Profile</h2>
             
