@@ -446,7 +446,7 @@ $mysqli->close();
                             ?>
                         </div>
                         <div class="hourly-rate-large">
-                            $<?php echo number_format($mentor['hourly_rate'], 0); ?>/hour
+                            $<?php echo number_format($mentor['hourly_rate'] * 1.20, 0); ?>/hour
                         </div>
                     </div>
                 </div>
@@ -544,12 +544,16 @@ $mysqli->close();
                             <span>1 hour</span>
                         </div>
                         <div class="summary-row">
-                            <span>Rate:</span>
+                            <span>Mentor Rate:</span>
                             <span>$<?php echo number_format($mentor['hourly_rate'], 2); ?></span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Platform Fee (20%):</span>
+                            <span>$<?php echo number_format($mentor['hourly_rate'] * 0.20, 2); ?></span>
                         </div>
                         <div class="summary-row total">
                             <span>Total:</span>
-                            <span>$<?php echo number_format($mentor['hourly_rate'], 2); ?></span>
+                            <span>$<?php echo number_format($mentor['hourly_rate'] * 1.20, 2); ?></span>
                         </div>
                     </div>
 

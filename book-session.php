@@ -62,6 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $scheduled_date = date('Y-m-d', strtotime("+$days_ahead days"));
             $scheduled_datetime = $scheduled_date . ' ' . $selected_time . ':00';
             
+            // Calculate price with 20% platform fee
+            // Mentor earns their hourly_rate, mentee pays hourly_rate + 20%
+            $mentee_price = $mentor['hourly_rate'] * 1.20;
+            
             // Create session
             $status = 'pending';
             $payment_status = 'pending';
@@ -69,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 INSERT INTO sessions (mentor_id, mentee_id, scheduled_at, amount, status, payment_status)
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
-            $stmt->bind_param("iisdss", $mentor_id, $mentee_profile['id'], $scheduled_datetime, $mentor['hourly_rate'], $status, $payment_status);
+            $stmt->bind_param("iisdss", $mentor_id, $mentee_profile['id'], $scheduled_datetime, $mentee_price, $status, $payment_status);
             
             if ($stmt->execute()) {
                 $session_id = $mysqli->insert_id;

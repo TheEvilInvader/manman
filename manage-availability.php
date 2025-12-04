@@ -18,6 +18,12 @@ if (!$mentor) {
     redirect('mentor-dashboard.php');
 }
 
+// Check if mentor is approved
+if ($mentor['status'] !== 'approved') {
+    $_SESSION['error'] = 'You must be approved by admin before managing availability.';
+    redirect('mentor-dashboard.php');
+}
+
 $success = '';
 $error = '';
 

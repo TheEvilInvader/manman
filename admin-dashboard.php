@@ -66,9 +66,13 @@ $result = $mysqli->query("SELECT COUNT(*) as count FROM mentor_profiles WHERE st
 $row = $result->fetch_assoc();
 $stats['pending_mentors'] = $row['count'];
 
+// Calculate platform revenue (20% of all paid sessions)
 $result = $mysqli->query("SELECT SUM(amount) as total FROM sessions WHERE payment_status = 'paid'");
 $row = $result->fetch_assoc();
-$stats['total_revenue'] = $row['total'] ?? 0;
+$total_paid = $row['total'] ?? 0;
+// Platform earns 20% of the total (which is already included in the amount)
+// amount = mentor_rate * 1.20, so platform_fee = amount - (amount / 1.20)
+$stats['total_revenue'] = $total_paid - ($total_paid / 1.20);
 
 // Get pending mentors with categories
 $result = $mysqli->query("

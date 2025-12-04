@@ -407,6 +407,7 @@ $mysqli->close();
     <nav class="nav-bar">
         <div class="logo">🎓 MentorBridge</div>
         <div class="nav-buttons">
+            <a href="my-sessions.php" class="btn btn-primary" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));">My Sessions</a>
             <span style="color: #666;">👤 <?php echo htmlspecialchars($mentee_profile['full_name']); ?></span>
             <a href="logout.php" class="btn btn-secondary">Logout</a>
         </div>
@@ -522,7 +523,7 @@ $mysqli->close();
                             
                             <div class="mentor-footer">
                                 <div class="hourly-rate">
-                                    $<?php echo number_format($mentor['hourly_rate'], 0); ?>/hour
+                                    $<?php echo number_format($mentor['hourly_rate'] * 1.20, 0); ?>/hour
                                 </div>
                                 <a href="metnor-detail.php?id=<?php echo $mentor['id']; ?>" class="btn-view" onclick="event.stopPropagation()">
                                     View Profile →

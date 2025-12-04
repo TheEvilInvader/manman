@@ -7,6 +7,7 @@ USE mentorbridge;
 -- Drop tables if they exist (for fresh install)
 DROP TABLE IF EXISTS feedback;
 DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS mentor_availability;
 DROP TABLE IF EXISTS time_slots;
 DROP TABLE IF EXISTS mentor_categories;
 DROP TABLE IF EXISTS categories;
@@ -94,7 +95,7 @@ CREATE TABLE mentor_categories (
     INDEX idx_category (category_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Time slots for mentor availability
+-- Time slots for mentor availability (deprecated - use mentor_availability instead)
 CREATE TABLE time_slots (
     id INT PRIMARY KEY AUTO_INCREMENT,
     mentor_id INT NOT NULL,
@@ -105,6 +106,20 @@ CREATE TABLE time_slots (
     FOREIGN KEY (mentor_id) REFERENCES mentor_profiles(id) ON DELETE CASCADE,
     INDEX idx_mentor (mentor_id),
     INDEX idx_day (day_of_week),
+    INDEX idx_available (is_available)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Mentor availability slots (new system)
+CREATE TABLE mentor_availability (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    mentor_id INT NOT NULL,
+    day_of_week VARCHAR(20) NOT NULL,
+    time_slot TIME NOT NULL,
+    is_available BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (mentor_id) REFERENCES mentor_profiles(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_slot (mentor_id, day_of_week, time_slot),
+    INDEX idx_mentor (mentor_id),
     INDEX idx_available (is_available)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -142,9 +157,7 @@ CREATE TABLE feedback (
     INDEX idx_rating (rating)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create an admin user (password: admin123)
-INSERT INTO users (email, password, role, status) VALUES 
-('admin2@mentorbridge.com', 'hello', 'admin', 'active');
+-- Create an admin user (password: admin)
 INSERT INTO users (email, password, role, status) VALUES 
 ('admin@mentorbridge.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active');
 
@@ -172,6 +185,25 @@ INSERT INTO sessions (mentor_id, mentee_id, scheduled_at, amount, status, paymen
 -- Sample feedback (for testing)
 INSERT INTO feedback (session_id, rating, comment) VALUES 
 (1, 5, 'John is an amazing mentor! Very patient and explains concepts clearly. Highly recommend!');
+
+-- Trigger to automatically create default availability slots when mentor is approved
+DELIMITER $$
+
+CREATE TRIGGER create_default_availability AFTER UPDATE ON mentor_profiles
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 'approved' AND OLD.status != 'approved' THEN
+        -- Insert default 9:00 AM slots for Monday through Friday
+        INSERT IGNORE INTO mentor_availability (mentor_id, day_of_week, time_slot, is_available) VALUES
+        (NEW.id, 'Monday', '09:00:00', 1),
+        (NEW.id, 'Tuesday', '09:00:00', 1),
+        (NEW.id, 'Wednesday', '09:00:00', 1),
+        (NEW.id, 'Thursday', '09:00:00', 1),
+        (NEW.id, 'Friday', '09:00:00', 1);
+    END IF;
+END$$
+
+DELIMITER ;
 
 -- Trigger to update mentor rating when feedback is added
 DELIMITER $$
