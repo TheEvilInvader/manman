@@ -17,7 +17,7 @@ $stmt->close();
 // Check if mentor is approved
 if ($profile['status'] !== 'approved') {
     $_SESSION['error'] = 'Access denied. Only approved mentors can view sessions.';
-    redirect('mentor-dashboard.php');
+    redirect('mentor-profile.php');
 }
 
 $success = $_SESSION['success'] ?? '';
@@ -336,7 +336,7 @@ $mysqli->close();
     <nav class="navbar">
         <div class="logo">🎓 MentorBridge</div>
         <div class="nav-buttons">
-            <a href="mentor-dashboard.php" class="btn btn-secondary">Edit Profile</a>
+            <a href="mentor-profile.php" class="btn btn-secondary">Edit Profile</a>
             <a href="manage-availability.php" class="btn btn-secondary">Manage Availability</a>
             <a href="logout.php" class="btn btn-primary">Logout</a>
         </div>

@@ -15,13 +15,13 @@ $mentor = $result->fetch_assoc();
 $stmt->close();
 
 if (!$mentor) {
-    redirect('mentor-dashboard.php');
+    redirect('mentor-profile.php');
 }
 
 // Check if mentor is approved
 if ($mentor['status'] !== 'approved') {
     $_SESSION['error'] = 'You must be approved by admin before managing availability.';
-    redirect('mentor-dashboard.php');
+    redirect('mentor-profile.php');
 }
 
 $success = '';

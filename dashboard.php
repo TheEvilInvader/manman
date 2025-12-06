@@ -21,9 +21,9 @@ switch ($role) {
         
         // Redirect to home if approved, dashboard if new/pending
         if ($profile && $profile['status'] === 'approved') {
-            redirect('mentor-home.php');
-        } else {
             redirect('mentor-dashboard.php');
+        } else {
+            redirect('mentor-profile.php');
         }
         break;
     case 'mentee':
