@@ -83,7 +83,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - MentorBridge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --color-primary: #638ECB;
+            --color-primary-dark: #395886;
+            --color-primary-light: #8AAEE0;
+            --color-accent: #B1C9EF;
+            --color-bg-light: #F0F3FA;
+            --color-bg-lighter: #D5DEEF;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -91,8 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -102,12 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .register-container {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(99, 142, 203, 0.15);
             width: 100%;
-            max-width: 500px;
+            max-width: 520px;
             padding: 3rem;
             animation: slideUp 0.5s ease;
+            border: 1px solid rgba(99, 142, 203, 0.1);
         }
 
         @keyframes slideUp {
@@ -123,20 +136,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .logo {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 0.5rem;
+            filter: drop-shadow(0 2px 4px rgba(99, 142, 203, 0.2));
         }
 
         h1 {
             text-align: center;
-            color: #667eea;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
             text-align: center;
-            color: #666;
+            color: #64748b;
             margin-bottom: 2rem;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         .role-selection {
@@ -147,13 +168,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .role-card {
-            border: 3px solid #e0e0e0;
-            border-radius: 15px;
+            border: 2px solid var(--color-bg-lighter);
+            border-radius: 16px;
             padding: 1.5rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            background: white;
         }
 
         .role-card input[type="radio"] {
@@ -161,13 +183,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .role-card:hover {
-            border-color: #667eea;
+            border-color: var(--color-primary-light);
             transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(99, 142, 203, 0.15);
         }
 
         .role-card input[type="radio"]:checked + label {
-            border-color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-color: var(--color-primary);
+        }
+
+        .role-card.selected {
+            border-color: var(--color-primary);
+            background: linear-gradient(135deg, rgba(99, 142, 203, 0.05), rgba(177, 201, 239, 0.08));
+            box-shadow: 0 8px 25px rgba(99, 142, 203, 0.15);
         }
 
         .role-card label {
@@ -178,18 +206,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .role-icon {
             font-size: 3rem;
             margin-bottom: 0.5rem;
+            filter: grayscale(0.3);
+            transition: filter 0.3s ease;
+        }
+
+        .role-card.selected .role-icon {
+            filter: grayscale(0);
         }
 
         .role-title {
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: #333;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--color-primary-dark);
             margin-bottom: 0.3rem;
         }
 
         .role-desc {
-            font-size: 0.9rem;
-            color: #666;
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 500;
         }
 
         .form-group {
@@ -199,99 +234,154 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 500;
+            color: var(--color-primary-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
         input[type="text"],
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 0.9rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            padding: 0.9rem 1rem;
+            border: 2px solid var(--color-bg-lighter);
+            border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
         }
 
         input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 4px rgba(99, 142, 203, 0.1);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
         }
 
         .btn {
             width: 100%;
             padding: 1rem;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
             cursor: pointer;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
             color: white;
             transition: all 0.3s ease;
             margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(99, 142, 203, 0.3);
+            letter-spacing: 0.3px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(99, 142, 203, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .alert {
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
             margin-bottom: 1.5rem;
-            animation: shake 0.5s ease;
+            animation: slideDown 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
         }
 
         .alert-error {
-            background: #fee;
-            color: #c33;
-            border: 2px solid #fcc;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #fca5a5;
         }
 
         .alert-success {
-            background: #efe;
-            color: #3c3;
-            border: 2px solid #cfc;
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #6ee7b7;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .login-link {
             text-align: center;
             margin-top: 1.5rem;
-            color: #666;
+            color: #64748b;
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         .login-link a {
-            color: #667eea;
+            color: var(--color-primary);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
+            transition: color 0.3s ease;
         }
 
         .login-link a:hover {
+            color: var(--color-primary-dark);
             text-decoration: underline;
         }
 
         .back-home {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .back-home a {
-            color: #667eea;
+            color: var(--color-primary);
             text-decoration: none;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .back-home a:hover {
+            background: rgba(99, 142, 203, 0.1);
+            color: var(--color-primary-dark);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--color-bg-lighter);
+        }
+
+        .divider span {
+            padding: 0 1rem;
         }
 
         @media (max-width: 768px) {
@@ -301,6 +391,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             .role-selection {
                 grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
             }
         }
     </style>
@@ -383,24 +477,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Remove selected class from all cards
                 document.querySelectorAll('.role-card').forEach(c => {
-                    c.style.borderColor = '#e0e0e0';
-                    c.style.background = 'white';
+                    c.classList.remove('selected');
                 });
                 
                 // Add selected class to clicked card
-                this.style.borderColor = '#667eea';
-                this.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1))';
+                this.classList.add('selected');
             });
         });
         
         // Auto-select role if passed in URL
-        const selectedRole = new URLSearchParams(window.location.search).get('role');
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedRole = urlParams.get('role');
         if (selectedRole) {
-            const roleCard = document.getElementById(selectedRole);
-            if (roleCard) {
-                roleCard.click();
+            const roleRadio = document.getElementById(selectedRole);
+            if (roleRadio) {
+                roleRadio.checked = true;
+                roleRadio.closest('.role-card').classList.add('selected');
             }
         }
+        
+        // Check if any role is already selected on page load
+        document.querySelectorAll('input[name="role"]').forEach(radio => {
+            if (radio.checked) {
+                radio.closest('.role-card').classList.add('selected');
+            }
+        });
     </script>
 </body>
 </html>
