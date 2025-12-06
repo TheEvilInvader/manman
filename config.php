@@ -48,7 +48,7 @@ function requireRole($role) {
 
 function sanitize($data) {
     $mysqli = getDB();
-    return $mysqli->real_escape_string(htmlspecialchars(strip_tags(trim($data))));
+    return $mysqli->real_escape_string(strip_tags(trim($data)));
 }
 
 function redirect($url) {

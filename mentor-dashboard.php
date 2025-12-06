@@ -17,11 +17,13 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $profile = $result->fetch_assoc();
+$result->free();
 $stmt->close();
 
 // Get categories
 $result = $mysqli->query("SELECT * FROM categories ORDER BY name");
 $categories = $result->fetch_all(MYSQLI_ASSOC);
+$result->free();
 
 // Get mentor's selected categories
 $stmt = $mysqli->prepare("SELECT category_id FROM mentor_categories WHERE mentor_id = ?");
@@ -32,6 +34,7 @@ $selected_categories = [];
 while ($row = $result->fetch_assoc()) {
     $selected_categories[] = $row['category_id'];
 }
+$result->free();
 $stmt->close();
 
 $success = '';
@@ -66,14 +69,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['complete_session']))
             }
         }
         
+        // If mentor is approved and making changes, set status back to pending for re-approval
+        $new_status = $profile['status'];
+        if ($profile['status'] === 'approved') {
+            $new_status = 'pending';
+            $_SESSION['info'] = 'Profile changes submitted for admin re-approval. You can continue managing sessions.';
+        }
+        
         // Update mentor profile
         $stmt = $mysqli->prepare("
             UPDATE mentor_profiles 
             SET full_name = ?, bio = ?, skills = ?, experience = ?, 
-                hourly_rate = ?, profile_image = ?
+                hourly_rate = ?, profile_image = ?, status = ?
             WHERE user_id = ?
         ");
-        $stmt->bind_param("ssssdsi", $full_name, $bio, $skills, $experience, $hourly_rate, $profile_image, $user_id);
+        $stmt->bind_param("ssssdssi", $full_name, $bio, $skills, $experience, $hourly_rate, $profile_image, $new_status, $user_id);
         $stmt->execute();
         $stmt->close();
         
@@ -101,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['complete_session']))
         $stmt->execute();
         $result = $stmt->get_result();
         $profile = $result->fetch_assoc();
+        $result->free();
         $stmt->close();
         
         $stmt = $mysqli->prepare("SELECT category_id FROM mentor_categories WHERE mentor_id = ?");
@@ -111,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['complete_session']))
         while ($row = $result->fetch_assoc()) {
             $selected_categories[] = $row['category_id'];
         }
+        $result->free();
         $stmt->close();
         
     } catch(Exception $e) {
@@ -126,6 +138,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 $stats = $result->fetch_assoc();
 $total_sessions = $stats['total'];
+$result->free();
 $stmt->close();
 
 // Handle session completion
@@ -151,6 +164,7 @@ $stmt->bind_param("i", $profile['id']);
 $stmt->execute();
 $result = $stmt->get_result();
 $pending_sessions = $result->fetch_all(MYSQLI_ASSOC);
+$result->free();
 $stmt->close();
 
 $mysqli->close();
@@ -420,19 +434,32 @@ $mysqli->close();
     <nav class="nav-bar">
         <div class="logo">🎓 MentorBridge</div>
         <div class="nav-buttons">
-            <span style="color: #666;">👤 <?php echo htmlspecialchars($profile['full_name']); ?></span>
+            <span style="color: #666;">👤 <?php echo htmlspecialchars(!empty($profile['full_name']) ? $profile['full_name'] : 'John Doe'); ?></span>
+            <?php if ($profile['status'] === 'approved'): ?>
+                <a href="mentor-home.php" class="btn btn-primary">Dashboard</a>
+            <?php endif; ?>
             <a href="logout.php" class="btn btn-secondary">Logout</a>
         </div>
     </nav>
 
     <div class="container">
-        <?php if ($profile['status'] === 'pending'): ?>
+        <?php if (isset($_SESSION['info'])): ?>
+            <div class="status-banner" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                ℹ️ <?php echo $_SESSION['info']; unset($_SESSION['info']); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($profile['status'] === 'pending' && empty($profile['full_name'])): ?>
             <div class="status-banner status-pending">
-                ⏳ Your profile is pending admin approval. You'll be able to accept sessions once approved.
+                👋 Welcome! Please complete your mentor profile to get started.
+            </div>
+        <?php elseif ($profile['status'] === 'pending'): ?>
+            <div class="status-banner status-pending">
+                ⏳ Your profile is pending admin approval. You'll be notified once approved.
             </div>
         <?php elseif ($profile['status'] === 'approved'): ?>
             <div class="status-banner status-approved">
-                ✅ Your profile is approved! You can now receive session bookings.
+                ✅ Edit your profile here - changes will require admin re-approval but won't interrupt your sessions.
             </div>
         <?php elseif ($profile['status'] === 'rejected'): ?>
             <div class="status-banner status-rejected">
@@ -465,14 +492,6 @@ $mysqli->close();
                 <div class="stat-label">Hourly Rate</div>
             </div>
         </div>
-
-        <?php if ($profile['status'] === 'approved'): ?>
-        <div class="profile-card" style="background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary)); color: white; text-align: center;">
-            <h2 style="color: white; margin-bottom: 1rem;">🕐 Manage Your Availability</h2>
-            <p style="margin-bottom: 1.5rem; opacity: 0.9;">Control when mentees can book sessions with you by adding or removing time slots</p>
-            <a href="manage-availability.php" class="btn btn-secondary" style="background: white; color: var(--color-primary-dark); font-weight: 700;">Manage Time Slots</a>
-        </div>
-        <?php endif; ?>
 
         <div class="profile-card">
             <h2>📝 Your Profile</h2>
@@ -542,55 +561,6 @@ $mysqli->close();
                 </button>
             </form>
         </div>
-
-        <!-- Booked Sessions Section -->
-        <?php if ($profile['status'] === 'approved' && !empty($pending_sessions)): ?>
-        <div class="profile-card">
-            <h2>📅 Upcoming Sessions</h2>
-            <p style="color: #64748b; margin-bottom: 1.5rem;">Sessions booked by mentees. Mark them as complete when finished.</p>
-            
-            <?php foreach ($pending_sessions as $session): ?>
-                <div style="background: var(--color-bg-light); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; border-left: 4px solid var(--color-primary);">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                        <div>
-                            <h3 style="color: var(--color-primary-dark); margin-bottom: 0.5rem;">
-                                <?php echo htmlspecialchars($session['mentee_name']); ?>
-                            </h3>
-                            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                                <strong>Scheduled:</strong> 
-                                <?php 
-                                $start = strtotime($session['scheduled_at']);
-                                $end = $start + 3600;
-                                echo date('l, F j, Y', $start) . '<br>' . 
-                                     date('g:i A', $start) . ' - ' . date('g:i A', $end);
-                                ?>
-                            </p>
-                            <p style="color: #64748b; font-size: 0.9rem;">
-                                <strong>Amount:</strong> $<?php echo number_format($session['amount'], 2); ?>
-                            </p>
-                            <?php if (!empty($session['interests'])): ?>
-                                <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">
-                                    <strong>Interests:</strong> <?php echo htmlspecialchars($session['interests']); ?>
-                                </p>
-                            <?php endif; ?>
-                        </div>
-                        <div>
-                            <span style="background: <?php echo $session['status'] === 'confirmed' ? '#10b981' : '#f59e0b'; ?>; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
-                                <?php echo ucfirst($session['status']); ?>
-                            </span>
-                        </div>
-                    </div>
-                    <form method="POST" style="margin-top: 1rem;">
-                        <input type="hidden" name="session_id" value="<?php echo $session['id']; ?>">
-                        <input type="hidden" name="complete_session" value="1">
-                        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="return confirm('Mark this session as completed?')">
-                            ✓ Mark as Completed
-                        </button>
-                    </form>
-                </div>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
     </div>
 </body>
 </html>

@@ -94,17 +94,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get all availability slots
+// Get all availability slots with booking status
 $stmt = $mysqli->prepare("
-    SELECT id, day_of_week, TIME_FORMAT(time_slot, '%H:%i') as time_slot, is_available
-    FROM mentor_availability
-    WHERE mentor_id = ?
-    ORDER BY FIELD(day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), time_slot
+    SELECT ma.id, ma.day_of_week, TIME_FORMAT(ma.time_slot, '%H:%i') as time_slot, ma.is_available,
+           COUNT(CASE WHEN s.status IN ('pending', 'confirmed') THEN 1 END) as has_booking,
+           COUNT(CASE WHEN s.status = 'completed' AND f.id IS NULL THEN 1 END) as awaiting_feedback
+    FROM mentor_availability ma
+    LEFT JOIN sessions s ON ma.mentor_id = s.mentor_id 
+        AND DAYNAME(s.scheduled_at) = ma.day_of_week 
+        AND TIME_FORMAT(s.scheduled_at, '%H:%i') = TIME_FORMAT(ma.time_slot, '%H:%i')
+    LEFT JOIN feedback f ON s.id = f.session_id
+    WHERE ma.mentor_id = ?
+    GROUP BY ma.id, ma.day_of_week, ma.time_slot, ma.is_available
+    ORDER BY FIELD(ma.day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), ma.time_slot
 ");
 $stmt->bind_param("i", $mentor['id']);
 $stmt->execute();
 $result = $stmt->get_result();
 $slots = $result->fetch_all(MYSQLI_ASSOC);
+$result->free();
 $stmt->close();
 
 // Organize by day
@@ -380,6 +388,16 @@ $mysqli->close();
             color: #92400e;
         }
 
+        .status-disabled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-feedback {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .slot-actions {
             display: flex;
             gap: 0.5rem;
@@ -485,11 +503,28 @@ $mysqli->close();
                                             echo $start . ' - ' . $end;
                                             ?>
                                         </div>
-                                        <span class="slot-status <?php echo $slot['is_available'] ? 'status-available' : 'status-booked'; ?>">
-                                            <?php echo $slot['is_available'] ? 'Available' : 'Booked'; ?>
+                                        <span class="slot-status <?php 
+                                            if ($slot['awaiting_feedback'] > 0) {
+                                                echo 'status-feedback';
+                                            } elseif ($slot['has_booking'] > 0) {
+                                                echo 'status-booked';
+                                            } else {
+                                                echo $slot['is_available'] ? 'status-available' : 'status-disabled';
+                                            }
+                                        ?>">
+                                            <?php 
+                                            if ($slot['awaiting_feedback'] > 0) {
+                                                echo 'Waiting for Feedback';
+                                            } elseif ($slot['has_booking'] > 0) {
+                                                echo 'Booked';
+                                            } else {
+                                                echo $slot['is_available'] ? 'Available' : 'Disabled';
+                                            }
+                                            ?>
                                         </span>
                                     </div>
                                     <div class="slot-actions">
+                                        <?php if ($slot['has_booking'] == 0 && $slot['awaiting_feedback'] == 0): ?>
                                         <form method="POST" style="display: inline;">
                                             <input type="hidden" name="action" value="toggle">
                                             <input type="hidden" name="slot_id" value="<?php echo $slot['id']; ?>">
@@ -502,6 +537,7 @@ $mysqli->close();
                                             <input type="hidden" name="slot_id" value="<?php echo $slot['id']; ?>">
                                             <button type="submit" class="btn btn-danger">Delete</button>
                                         </form>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

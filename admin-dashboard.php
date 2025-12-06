@@ -74,19 +74,37 @@ $total_paid = $row['total'] ?? 0;
 // amount = mentor_rate * 1.20, so platform_fee = amount - (amount / 1.20)
 $stats['total_revenue'] = $total_paid - ($total_paid / 1.20);
 
-// Get pending mentors with categories
+// Get new mentor applications (never been approved)
 $result = $mysqli->query("
     SELECT mp.*, u.email, u.created_at as registration_date,
-           GROUP_CONCAT(c.name SEPARATOR ', ') as categories
+           GROUP_CONCAT(c.name SEPARATOR ', ') as categories,
+           (SELECT COUNT(*) FROM sessions WHERE mentor_id = mp.id) as has_sessions
     FROM mentor_profiles mp 
     JOIN users u ON mp.user_id = u.id 
     LEFT JOIN mentor_categories mc ON mp.id = mc.mentor_id
     LEFT JOIN categories c ON mc.category_id = c.id
     WHERE mp.status = 'pending' 
     GROUP BY mp.id
+    HAVING has_sessions = 0
     ORDER BY mp.created_at DESC
 ");
-$pending_mentors = $result->fetch_all(MYSQLI_ASSOC);
+$new_applications = $result->fetch_all(MYSQLI_ASSOC);
+
+// Get profile update requests (pending from approved mentors with sessions)
+$result = $mysqli->query("
+    SELECT mp.*, u.email, u.created_at as registration_date,
+           GROUP_CONCAT(c.name SEPARATOR ', ') as categories,
+           (SELECT COUNT(*) FROM sessions WHERE mentor_id = mp.id) as session_count
+    FROM mentor_profiles mp 
+    JOIN users u ON mp.user_id = u.id 
+    LEFT JOIN mentor_categories mc ON mp.id = mc.mentor_id
+    LEFT JOIN categories c ON mc.category_id = c.id
+    WHERE mp.status = 'pending' 
+    GROUP BY mp.id
+    HAVING session_count > 0
+    ORDER BY mp.updated_at DESC
+");
+$profile_updates = $result->fetch_all(MYSQLI_ASSOC);
 
 // Get recent users
 $result = $mysqli->query("
@@ -697,23 +715,25 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('pending')">Pending Approvals (<?php echo count($pending_mentors); ?>)</button>
+            <button class="tab active" onclick="switchTab('applications')">New Applications (<?php echo count($new_applications); ?>)</button>
+            <button class="tab" onclick="switchTab('updates')">Profile Updates (<?php echo count($profile_updates); ?>)</button>
             <button class="tab" onclick="switchTab('users')">Users</button>
             <button class="tab" onclick="switchTab('sessions')">Sessions</button>
             <button class="tab" onclick="switchTab('topmentors')">Top Mentors</button>
         </div>
 
-        <!-- Pending Mentors Tab -->
-        <div id="tab-pending" class="tab-content active">
+        <!-- New Applications Tab -->
+        <div id="tab-applications" class="tab-content active">
             <div class="section">
-                <h2>Pending Mentor Approvals</h2>
-                <?php if (empty($pending_mentors)): ?>
+                <h2>📝 New Mentor Applications</h2>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">First-time mentor applications awaiting approval</p>
+                <?php if (empty($new_applications)): ?>
                     <div class="no-data">
                         <div class="no-data-icon">✅</div>
-                        <p>No pending approvals! All mentors have been reviewed.</p>
+                        <p>No new applications! All mentors have been reviewed.</p>
                     </div>
                 <?php else: ?>
-                    <?php foreach ($pending_mentors as $mentor): ?>
+                    <?php foreach ($new_applications as $mentor): ?>
                         <div class="mentor-item">
                             <div class="mentor-header">
                                 <div class="mentor-info">
@@ -744,6 +764,79 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
                                         <input type="hidden" name="mentor_id" value="<?php echo $mentor['id']; ?>">
                                         <input type="hidden" name="action" value="reject">
                                         <button type="submit" class="btn btn-reject">Reject</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="mentor-details">
+                                <div class="detail-row">
+                                    <strong>Bio</strong>
+                                    <?php echo nl2br(htmlspecialchars($mentor['bio'])); ?>
+                                </div>
+                                <div class="detail-row">
+                                    <strong>Experience</strong>
+                                    <?php echo nl2br(htmlspecialchars($mentor['experience'])); ?>
+                                </div>
+                                <div class="detail-row">
+                                    <strong>Skills</strong>
+                                    <div class="skills-tags">
+                                        <?php 
+                                        $skills = explode(',', $mentor['skills']);
+                                        foreach ($skills as $skill): 
+                                        ?>
+                                            <span class="skill-tag"><?php echo trim(htmlspecialchars($skill)); ?></span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Profile Updates Tab -->
+        <div id="tab-updates" class="tab-content">
+            <div class="section">
+                <h2>🔄 Mentor Profile Update Requests</h2>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Previously approved mentors requesting profile changes - re-approval required</p>
+                <?php if (empty($profile_updates)): ?>
+                    <div class="no-data">
+                        <div class="no-data-icon">✅</div>
+                        <p>No profile update requests!</p>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($profile_updates as $mentor): ?>
+                        <div class="mentor-item" style="border-left: 4px solid #f59e0b;">
+                            <div class="mentor-header">
+                                <div class="mentor-info">
+                                    <h3><?php echo htmlspecialchars($mentor['full_name']); ?> <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">UPDATE REQUEST</span></h3>
+                                    <div class="mentor-email"><?php echo htmlspecialchars($mentor['email']); ?></div>
+                                    <div class="mentor-meta">
+                                        Last Updated: <?php echo date('M d, Y g:i A', strtotime($mentor['updated_at'])); ?> | 
+                                        Rate: $<?php echo number_format($mentor['hourly_rate'], 2); ?>/hour |
+                                        Sessions: <?php echo $mentor['session_count']; ?>
+                                    </div>
+                                    <?php if (!empty($mentor['categories'])): ?>
+                                        <div class="category-tags">
+                                            <?php 
+                                            $categories = explode(', ', $mentor['categories']);
+                                            foreach ($categories as $category): 
+                                            ?>
+                                                <span class="category-tag"><?php echo htmlspecialchars($category); ?></span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="mentor-actions">
+                                    <form method="POST" style="display: inline;">
+                                        <input type="hidden" name="mentor_id" value="<?php echo $mentor['id']; ?>">
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn btn-approve">Re-Approve</button>
+                                    </form>
+                                    <form method="POST" style="display: inline;">
+                                        <input type="hidden" name="mentor_id" value="<?php echo $mentor['id']; ?>">
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="btn btn-reject">Reject Changes</button>
                                     </form>
                                 </div>
                             </div>
