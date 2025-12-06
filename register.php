@@ -85,15 +85,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Register - MentorBridge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primary: #638ECB;
-            --color-primary-dark: #395886;
-            --color-primary-light: #8AAEE0;
-            --color-accent: #B1C9EF;
-            --color-bg-light: #F0F3FA;
-            --color-bg-lighter: #D5DEEF;
+            --color-primary: #6366f1;
+            --color-primary-dark: #4f46e5;
+            --color-secondary: #8b5cf6;
+            --color-accent: #a78bfa;
+            --color-neon: #c084fc;
+            --color-dark: #0f172a;
+            --color-darker: #020617;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-glow: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.3));
         }
 
         * {
@@ -104,29 +107,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
         }
 
         .register-container {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(99, 142, 203, 0.15);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            box-shadow: 
+                0 0 80px rgba(139, 92, 246, 0.2),
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 1px rgba(167, 139, 250, 0.2);
             width: 100%;
             max-width: 520px;
             padding: 3rem;
-            animation: slideUp 0.5s ease;
-            border: 1px solid rgba(99, 142, 203, 0.1);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 10;
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(50px);
             }
             to {
                 opacity: 1;
@@ -134,48 +173,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(99, 102, 241, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(139, 92, 246, 0.6), 0 0 60px rgba(99, 102, 241, 0.4);
+            }
+        }
+
         .logo {
             text-align: center;
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-            filter: drop-shadow(0 2px 4px rgba(99, 142, 203, 0.2));
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+            animation: glow 3s ease-in-out infinite;
         }
 
         h1 {
             text-align: center;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
-            font-size: 2rem;
-            font-weight: 800;
+            font-size: 2.5rem;
+            font-weight: 900;
             letter-spacing: -0.5px;
+            text-shadow: 0 0 30px rgba(167, 139, 250, 0.5);
         }
 
         .subtitle {
             text-align: center;
-            color: #64748b;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-            font-weight: 500;
+            color: #a5b4fc;
+            margin-bottom: 2.5rem;
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
         }
 
         .role-selection {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 1.25rem;
             margin-bottom: 2rem;
         }
 
         .role-card {
-            border: 2px solid var(--color-bg-lighter);
-            border-radius: 16px;
-            padding: 1.5rem;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            padding: 2rem 1rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
-            background: white;
+            background: rgba(15, 23, 42, 0.5);
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
 
         .role-card input[type="radio"] {
@@ -183,19 +252,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .role-card:hover {
-            border-color: var(--color-primary-light);
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(99, 142, 203, 0.15);
-        }
-
-        .role-card input[type="radio"]:checked + label {
-            border-color: var(--color-primary);
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 
+                0 20px 40px rgba(139, 92, 246, 0.3),
+                0 0 60px rgba(99, 102, 241, 0.2),
+                inset 0 0 20px rgba(139, 92, 246, 0.1);
         }
 
         .role-card.selected {
-            border-color: var(--color-primary);
-            background: linear-gradient(135deg, rgba(99, 142, 203, 0.05), rgba(177, 201, 239, 0.08));
-            box-shadow: 0 8px 25px rgba(99, 142, 203, 0.15);
+            border-color: transparent;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.2));
+            box-shadow: 
+                0 0 50px rgba(139, 92, 246, 0.5),
+                0 20px 40px rgba(139, 92, 246, 0.3),
+                inset 0 0 30px rgba(139, 92, 246, 0.2);
+            transform: scale(1.05);
+        }
+
+        .role-card.selected::before {
+            opacity: 1;
         }
 
         .role-card label {
@@ -204,27 +280,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .role-icon {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-            filter: grayscale(0.3);
-            transition: filter 0.3s ease;
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.4s ease;
         }
 
-        .role-card.selected .role-icon {
-            filter: grayscale(0);
+        .role-icon::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.4s ease;
+        }
+
+        .role-card.selected .role-icon::before {
+            opacity: 1;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        .role-icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: #a78bfa;
+            transition: stroke 0.4s ease;
+        }
+
+        .role-card.selected .role-icon svg {
+            stroke: #fff;
+            filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.8));
         }
 
         .role-title {
             font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--color-primary-dark);
-            margin-bottom: 0.3rem;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            transition: all 0.4s ease;
+        }
+
+        .role-card.selected .role-title {
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .role-desc {
             font-size: 0.85rem;
-            color: #64748b;
-            font-weight: 500;
+            color: #94a3b8;
+            font-weight: 400;
         }
 
         .form-group {
@@ -233,86 +359,138 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: var(--color-primary-dark);
+            margin-bottom: 0.75rem;
+            color: #c7d2fe;
             font-weight: 600;
             font-size: 0.9rem;
+            letter-spacing: 0.3px;
         }
 
         input[type="text"],
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 0.9rem 1rem;
-            border: 2px solid var(--color-bg-lighter);
-            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 14px;
             font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             font-family: 'Inter', sans-serif;
             font-weight: 500;
+            background: rgba(15, 23, 42, 0.5);
+            color: #e0e7ff;
+            backdrop-filter: blur(10px);
         }
 
         input:focus {
             outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 4px rgba(99, 142, 203, 0.1);
+            border-color: #8b5cf6;
+            box-shadow: 
+                0 0 0 4px rgba(139, 92, 246, 0.15),
+                0 0 30px rgba(139, 92, 246, 0.3),
+                inset 0 0 20px rgba(139, 92, 246, 0.1);
+            background: rgba(15, 23, 42, 0.7);
+            transform: translateY(-2px);
         }
 
         input::placeholder {
-            color: #94a3b8;
+            color: #64748b;
             font-weight: 400;
         }
 
         .btn {
             width: 100%;
-            padding: 1rem;
+            padding: 1.1rem;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             color: white;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             margin-top: 1rem;
-            box-shadow: 0 4px 15px rgba(99, 142, 203, 0.3);
-            letter-spacing: 0.3px;
+            box-shadow: 
+                0 10px 30px rgba(139, 92, 246, 0.4),
+                0 0 0 0 rgba(139, 92, 246, 0.5);
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(99, 142, 203, 0.4);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 20px 50px rgba(139, 92, 246, 0.5),
+                0 0 60px rgba(139, 92, 246, 0.4),
+                0 0 0 6px rgba(139, 92, 246, 0.2);
+            animation: btnGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes btnGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 20px 50px rgba(139, 92, 246, 0.5),
+                    0 0 60px rgba(139, 92, 246, 0.4);
+            }
+            50% {
+                box-shadow: 
+                    0 20px 50px rgba(139, 92, 246, 0.7),
+                    0 0 80px rgba(139, 92, 246, 0.6);
+            }
         }
 
         .btn:active {
-            transform: translateY(0);
+            transform: translateY(-1px) scale(0.98);
         }
 
         .alert {
-            padding: 1rem 1.25rem;
-            border-radius: 12px;
+            padding: 1.1rem 1.5rem;
+            border-radius: 14px;
             margin-bottom: 1.5rem;
-            animation: slideDown 0.3s ease;
+            animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             font-weight: 500;
             font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid;
         }
 
         .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 2px solid #fca5a5;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
         }
 
         .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 2px solid #6ee7b7;
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border-color: rgba(34, 197, 94, 0.3);
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.2);
         }
 
         @keyframes slideDown {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(-20px);
             }
             to {
                 opacity: 1;
@@ -322,31 +500,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .login-link {
             text-align: center;
-            margin-top: 1.5rem;
-            color: #64748b;
+            margin-top: 2rem;
+            color: #94a3b8;
             font-size: 0.95rem;
-            font-weight: 500;
+            font-weight: 400;
         }
 
         .login-link a {
-            color: var(--color-primary);
+            color: #a78bfa;
             text-decoration: none;
             font-weight: 700;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .login-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            transition: width 0.3s ease;
+        }
+
+        .login-link a:hover::after {
+            width: 100%;
         }
 
         .login-link a:hover {
-            color: var(--color-primary-dark);
-            text-decoration: underline;
+            color: #c4b5fd;
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
         }
 
         .back-home {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .back-home a {
-            color: var(--color-primary);
+            color: #94a3b8;
             text-decoration: none;
             font-weight: 600;
             display: inline-flex;
@@ -354,34 +548,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 0.5rem;
             font-size: 0.9rem;
             transition: all 0.3s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .back-home a:hover {
-            background: rgba(99, 142, 203, 0.1);
-            color: var(--color-primary-dark);
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 1.5rem 0;
-            color: #94a3b8;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--color-bg-lighter);
-        }
-
-        .divider span {
-            padding: 0 1rem;
+            background: rgba(139, 92, 246, 0.1);
+            color: #a78bfa;
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateX(-5px);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -396,6 +573,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             h1 {
                 font-size: 1.75rem;
             }
+
+            .logo {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
@@ -405,9 +586,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="index.php">← Back to Home</a>
         </div>
         
-        <div class="logo">🎓</div>
+        <div class="logo">✨</div>
         <h1>Create Account</h1>
-        <p class="subtitle">Join MentorBridge today</p>
+        <p class="subtitle">Join MentorBridge and start your journey</p>
 
         <?php if ($error): ?>
             <div class="alert alert-error"><?php echo $error; ?></div>
@@ -434,7 +615,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="role-card">
                         <input type="radio" name="role" id="mentor" value="mentor" <?php echo $selectedRole === 'mentor' ? 'checked' : ''; ?> required>
                         <label for="mentor">
-                            <div class="role-icon">👨‍🏫</div>
+                            <div class="role-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 17L12 22L22 17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
                             <div class="role-title">Mentor</div>
                             <div class="role-desc">Share your knowledge</div>
                         </label>
@@ -442,7 +629,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="role-card">
                         <input type="radio" name="role" id="mentee" value="mentee" <?php echo $selectedRole === 'mentee' ? 'checked' : ''; ?> required>
                         <label for="mentee">
-                            <div class="role-icon">👨‍🎓</div>
+                            <div class="role-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 6V12L16 14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
                             <div class="role-title">Mentee</div>
                             <div class="role-desc">Learn from experts</div>
                         </label>
