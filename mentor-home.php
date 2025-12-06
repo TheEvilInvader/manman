@@ -341,7 +341,7 @@ $mysqli->close();
     <nav class="navbar">
         <div class="logo">🎓 MentorBridge</div>
         <div class="nav-buttons">
-            <a href="mentor-dashboard.php" class="btn btn-secondary">Edit Profile</a>
+            <a href="mentor-dashboard.php" class="btn btn-secondary">Profile Editing</a>
             <a href="manage-availability.php" class="btn btn-secondary">Manage Availability</a>
             <a href="logout.php" class="btn btn-primary">Logout</a>
         </div>

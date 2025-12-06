@@ -436,7 +436,7 @@ $mysqli->close();
         <div class="nav-buttons">
             <span style="color: #666;">👤 <?php echo htmlspecialchars(!empty($profile['full_name']) ? $profile['full_name'] : 'John Doe'); ?></span>
             <?php if ($profile['status'] === 'approved'): ?>
-                <a href="mentor-home.php" class="btn btn-primary">Dashboard</a>
+                <a href="mentor-home.php" class="btn btn-primary">Back to Dashboard</a>
             <?php endif; ?>
             <a href="logout.php" class="btn btn-secondary">Logout</a>
         </div>
