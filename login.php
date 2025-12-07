@@ -229,14 +229,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         h1 {
             text-align: center;
-            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #e0e7ff;
             margin-bottom: 0.5rem;
             font-size: 2.5rem;
             font-weight: 900;
             letter-spacing: -0.5px;
-            text-shadow: 0 0 30px rgba(167, 139, 250, 0.5);
         }
 
         .subtitle {
@@ -400,17 +397,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <div class="logo">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 48px; height: 48px;">
-                <path d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z" stroke="url(#logoGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M16 6L17 8L19 9L17 10L16 12L15 10L13 9L15 8L16 6Z" stroke="url(#logoGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <defs>
-                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 64px; height: 64px; display: inline-block;">
+                <!-- User icon with arrow for login -->
+                <circle cx="28" cy="20" r="10" stroke="#8b5cf6" stroke-width="2" fill="none"/>
+                <path d="M14 50 C14 38 20 34 28 34 C36 34 42 38 42 50" stroke="#8b5cf6" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- Arrow pointing in -->
+                <path d="M52 32 L44 32 M48 28 L52 32 L48 36" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
+        
         <h1>Welcome Back</h1>
         <p class="subtitle">Login to your MentorBridge account</p>
 

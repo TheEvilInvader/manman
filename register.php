@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .logo {
             text-align: center;
-            font-size: 3.5rem;
+            font-size: 3rem;
             margin-bottom: 1rem;
             background: linear-gradient(135deg, #8b5cf6, #6366f1);
             -webkit-background-clip: text;
@@ -214,14 +214,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         h1 {
             text-align: center;
-            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #e0e7ff;
             margin-bottom: 0.5rem;
             font-size: 2.5rem;
             font-weight: 900;
             letter-spacing: -0.5px;
-            text-shadow: 0 0 30px rgba(167, 139, 250, 0.5);
         }
 
         .subtitle {
@@ -567,17 +564,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <div class="logo">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 48px; height: 48px;">
-                <path d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z" stroke="url(#logoGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M16 6L17 8L19 9L17 10L16 12L15 10L13 9L15 8L16 6Z" stroke="url(#logoGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <defs>
-                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 64px; height: 64px; display: inline-block;">
+                <!-- User icon with plus sign for registration -->
+                <circle cx="32" cy="20" r="10" stroke="#8b5cf6" stroke-width="2" fill="none"/>
+                <path d="M18 50 C18 38 24 34 32 34 C40 34 46 38 46 50" stroke="#8b5cf6" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- Plus sign -->
+                <circle cx="48" cy="16" r="10" fill="#6366f1"/>
+                <path d="M48 12 L48 20 M44 16 L52 16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
         </div>
+        
         <h1>Create Account</h1>
         <p class="subtitle">Join MentorBridge and start your journey</p>
 

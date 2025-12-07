@@ -43,9 +43,9 @@ $error = '';
 // Handle profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['complete_session'])) {
     $full_name = sanitize($_POST['full_name'] ?? '');
-    $bio = sanitize($_POST['bio'] ?? '');
+    $bio = $_POST['bio'] ?? '';
     $skills = sanitize($_POST['skills'] ?? '');
-    $experience = sanitize($_POST['experience'] ?? '');
+    $experience = $_POST['experience'] ?? '';
     $hourly_rate = floatval($_POST['hourly_rate'] ?? 0);
     $selected_cats = $_POST['categories'] ?? [];
     
@@ -395,9 +395,7 @@ $mysqli->close();
         }
 
         h2 {
-            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #e0e7ff;
             margin-bottom: 1.5rem;
             font-size: 1.8rem;
             font-weight: 800;
@@ -417,7 +415,6 @@ $mysqli->close();
 
         input[type="text"],
         input[type="number"],
-        input[type="file"],
         textarea,
         select {
             width: 100%;
@@ -430,6 +427,37 @@ $mysqli->close();
             background: rgba(15, 23, 42, 0.5);
             color: #e0e7ff;
             backdrop-filter: blur(10px);
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 14px;
+            font-size: 1rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Inter', sans-serif;
+            background: rgba(15, 23, 42, 0.5);
+            color: #e0e7ff;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        input[type="file"]::file-selector-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
         }
 
         textarea {
