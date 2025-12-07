@@ -476,11 +476,14 @@ $mysqli->close();
             box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
         }
 
+        .category-checkbox:has(input[type="checkbox"]:checked) {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.6);
+        }
+
         .category-checkbox input[type="checkbox"]:checked + label {
             color: #c4b5fd;
             font-weight: 700;
-            background: rgba(139, 92, 246, 0.15);
-            border-color: rgba(139, 92, 246, 0.6);
         }
 
         .category-checkbox input[type="checkbox"] {

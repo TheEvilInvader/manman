@@ -269,9 +269,7 @@ $mysqli->close();
         }
 
         .section h2 {
-            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #e0e7ff;
             font-size: 1.8rem;
             margin-bottom: 1rem;
         }
@@ -300,6 +298,13 @@ $mysqli->close();
             margin-top: 3rem;
         }
 
+        .reviews-section h2 {
+            color: #e0e7ff;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+
         .review-card {
             background: rgba(30, 27, 75, 0.6);
             border: 1px solid rgba(139, 92, 246, 0.2);
@@ -316,11 +321,11 @@ $mysqli->close();
 
         .reviewer-name {
             font-weight: 600;
-            color: #333;
+            color: #c7d2fe;
         }
 
         .review-date {
-            color: #999;
+            color: #94a3b8;
             font-size: 0.9rem;
         }
 
@@ -330,7 +335,7 @@ $mysqli->close();
         }
 
         .review-text {
-            color: #666;
+            color: #cbd5e1;
             line-height: 1.6;
         }
 
@@ -528,7 +533,7 @@ $mysqli->close();
                 <div class="reviews-section">
                     <h2>⭐ Reviews (<?php echo count($reviews); ?>)</h2>
                     <?php if (empty($reviews)): ?>
-                        <p style="color: #666;">No reviews yet. Be the first to book and review!</p>
+                        <p style="color: #94a3b8;">No reviews yet. Be the first to book and review!</p>
                     <?php else: ?>
                         <?php foreach ($reviews as $review): ?>
                             <div class="review-card">

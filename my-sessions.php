@@ -82,14 +82,6 @@ $mysqli->close();
     <title>My Sessions - MentorBridge</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --color-primary: #638ECB;
-            --color-primary-dark: #395886;
-            --color-primary-light: #8AAEE0;
-            --color-bg-light: #F0F3FA;
-            --color-bg-lighter: #D5DEEF;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -98,29 +90,86 @@ $mysqli->close();
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
             padding: 20px;
-            color: #1e293b;
+            color: #e0e7ff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
+        }
+
+        /* Floating Gradient Orbs */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
         }
 
         .nav-bar {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
             padding: 1.5rem 2.5rem;
             border-radius: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.15);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+            z-index: 10;
         }
 
         .logo {
             font-size: 1.8rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
         }
 
         .btn {
@@ -136,38 +185,57 @@ $mysqli->close();
         }
 
         .btn-secondary {
-            background: var(--color-bg-light);
-            color: var(--color-primary-dark);
+            background: rgba(139, 92, 246, 0.15);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 92, 246, 0.25);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
-            box-shadow: 0 4px 15px rgba(99, 142, 203, 0.3);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(99, 142, 203, 0.4);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
 
         .header {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
             padding: 2rem;
             border-radius: 20px;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.08);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .header h1 {
-            color: var(--color-primary-dark);
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
             font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .header p {
+            color: #94a3b8;
         }
 
         .alert {
@@ -175,18 +243,22 @@ $mysqli->close();
             border-radius: 12px;
             margin-bottom: 1.5rem;
             animation: slideDown 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid;
         }
 
         .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 2px solid #6ee7b7;
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border-color: rgba(34, 197, 94, 0.3);
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.2);
         }
 
         .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 2px solid #fca5a5;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
         }
 
         .sessions-grid {
@@ -195,11 +267,19 @@ $mysqli->close();
         }
 
         .session-card {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
             padding: 2rem;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.08);
-            border-left: 4px solid var(--color-primary);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-left: 4px solid #8b5cf6;
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.4);
         }
 
         .session-header {
@@ -219,12 +299,15 @@ $mysqli->close();
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: var(--color-primary);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 1.5rem;
+            font-weight: 700;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
         }
 
         .mentor-avatar img {
@@ -234,30 +317,40 @@ $mysqli->close();
             object-fit: cover;
         }
 
+        .mentor-name {
+            color: #c7d2fe;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
         .status-badge {
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
+            border: 1px solid;
         }
 
         .status-completed {
-            background: #d1fae5;
-            color: #065f46;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border-color: rgba(34, 197, 94, 0.3);
         }
 
         .status-confirmed {
-            background: #dbeafe;
-            color: #1e40af;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
         .status-pending {
-            background: #fef3c7;
-            color: #92400e;
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.3);
         }
 
         .session-details {
-            color: #64748b;
+            color: #cbd5e1;
             margin-bottom: 1.5rem;
         }
 
@@ -265,11 +358,21 @@ $mysqli->close();
             margin-bottom: 0.5rem;
         }
 
+        .session-details strong {
+            color: #94a3b8;
+        }
+
         .feedback-section {
-            background: var(--color-bg-light);
+            background: rgba(30, 27, 75, 0.6);
             padding: 1.5rem;
             border-radius: 12px;
             margin-top: 1rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .feedback-section h3 {
+            color: #c7d2fe;
+            margin-bottom: 1rem;
         }
 
         .rating-stars {
@@ -293,24 +396,41 @@ $mysqli->close();
         textarea {
             width: 100%;
             padding: 0.75rem;
-            border: 2px solid var(--color-bg-lighter);
+            border: 2px solid rgba(139, 92, 246, 0.3);
             border-radius: 12px;
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
             min-height: 100px;
             resize: vertical;
+            background: rgba(30, 27, 75, 0.6);
+            color: #e0e7ff;
         }
 
         textarea:focus {
             outline: none;
-            border-color: var(--color-primary);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        textarea::placeholder {
+            color: #64748b;
         }
 
         .submitted-feedback {
-            background: var(--color-bg-light);
+            background: rgba(30, 27, 75, 0.6);
             padding: 1.5rem;
             border-radius: 12px;
             margin-top: 1rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .submitted-feedback h3 {
+            color: #c7d2fe;
+            margin-bottom: 1rem;
+        }
+
+        .submitted-feedback p {
+            color: #cbd5e1;
         }
 
         .submitted-stars {

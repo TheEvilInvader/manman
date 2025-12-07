@@ -71,7 +71,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
             justify-content: center;
             padding: 20px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+        }
+
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #7c3aed 0%, #a78bfa 100%);
         }
 
         body::before {
@@ -199,13 +216,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
         }
         
         .payment-methods h3 {
-            color: var(--color-primary-dark);
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
+            color: #e0e7ff;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 800;
         }
         
         .payment-option {
-            border: 2px solid var(--color-bg-light);
+            border: 2px solid rgba(139, 92, 246, 0.2);
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 0.75rem;
@@ -214,11 +232,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
             display: flex;
             align-items: center;
             gap: 1rem;
+            background: rgba(30, 27, 75, 0.4);
         }
         
         .payment-option:hover {
-            border-color: var(--color-primary-light);
-            background: var(--color-bg-light);
+            border-color: rgba(139, 92, 246, 0.5);
+            background: rgba(30, 27, 75, 0.6);
         }
         
         .payment-option input[type="radio"] {
@@ -234,11 +253,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
             align-items: center;
             gap: 0.5rem;
             font-weight: 500;
+            color: #e0e7ff;
         }
         
         .payment-option.selected {
-            border-color: var(--color-primary);
-            background: var(--color-bg-light);
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.15);
         }
         
         .error-message {

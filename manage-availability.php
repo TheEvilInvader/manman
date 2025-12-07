@@ -323,6 +323,50 @@ $mysqli->close();
             background: rgba(30, 27, 75, 0.8);
         }
 
+        /* Style for time input - make fully clickable */
+        input[type="time"] {
+            cursor: pointer;
+            position: relative;
+            color-scheme: dark;
+        }
+
+        /* Make the calendar icon cover entire input area */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            left: 0;
+            top: 0;
+        }
+
+        /* Make all time picker fields clickable */
+        input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+            cursor: pointer;
+        }
+
+        input[type="time"]::-webkit-datetime-edit {
+            cursor: pointer;
+        }
+
+        input[type="time"]::-webkit-datetime-edit-hour-field,
+        input[type="time"]::-webkit-datetime-edit-minute-field,
+        input[type="time"]::-webkit-datetime-edit-ampm-field {
+            cursor: pointer;
+        }
+
+        /* Style select dropdown */
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: #1e1b4b;
+            color: #e0e7ff;
+        }
+
         .btn {
             padding: 0.75rem 1.5rem;
             border: none;
@@ -369,15 +413,20 @@ $mysqli->close();
         }
 
         .slots-section {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
             padding: 2rem;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.08);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .slots-section h2 {
-            color: var(--color-primary-dark);
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 1.5rem;
+            font-weight: 800;
             font-size: 1.3rem;
         }
 
@@ -387,37 +436,41 @@ $mysqli->close();
 
         .day-header {
             font-weight: 700;
-            color: var(--color-primary-dark);
+            color: #c7d2fe;
             font-size: 1.1rem;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--color-bg-light);
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
         }
 
         .slots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
             gap: 1rem;
         }
 
         .slot-card {
-            background: var(--color-bg-light);
-            padding: 1rem;
+            background: rgba(30, 27, 75, 0.6);
+            padding: 1rem 1.25rem;
             border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
             transition: all 0.3s ease;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .slot-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(99, 142, 203, 0.15);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.4);
         }
 
         .slot-card.unavailable {
             opacity: 0.6;
-            background: #fee2e2;
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
         }
 
         .slot-info {
@@ -429,7 +482,7 @@ $mysqli->close();
         .slot-time {
             font-size: 1.1rem;
             font-weight: 600;
-            color: var(--color-primary-dark);
+            color: #c7d2fe;
             white-space: nowrap;
         }
 
@@ -441,28 +494,39 @@ $mysqli->close();
         }
 
         .status-available {
-            background: #d1fae5;
-            color: #065f46;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .status-booked {
-            background: #fef3c7;
-            color: #92400e;
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .status-waiting {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
         .status-disabled {
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .status-feedback {
-            background: #fef3c7;
-            color: #92400e;
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
         }
 
         .slot-actions {
             display: flex;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .no-slots {
