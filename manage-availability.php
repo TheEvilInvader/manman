@@ -489,13 +489,25 @@ $mysqli->close();
 </head>
 <body>
     <nav class="nav-bar">
-        <div class="logo">MentorBridge</div>
-        <a href="mentor-dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px; display: inline-block; vertical-align: middle; margin-right: 8px;">
+                <path d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z" stroke="url(#logoGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 6L17 8L19 9L17 10L16 12L15 10L13 9L15 8L16 6Z" stroke="url(#logoGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            MentorBridge
+        </div>
+        <a href="mentor-dashboard.php" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; background: rgba(139, 92, 246, 0.2); border: 2px solid rgba(139, 92, 246, 0.4); color: #c4b5fd; font-weight: 600; box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);">← Back to Dashboard</a>
     </nav>
 
     <div class="container">
         <div class="header">
-            <h1>📅 Manage Your Availability</h1>
+            <h1>Manage Your Availability</h1>
             <p>Add or remove time slots to control when mentees can book sessions with you</p>
         </div>
 
@@ -508,7 +520,7 @@ $mysqli->close();
         <?php endif; ?>
 
         <div class="add-slot-form">
-            <h2>➕ Add New Time Slot</h2>
+            <h2>Add New Time Slot</h2>
             <form method="POST">
                 <input type="hidden" name="action" value="add">
                 <div class="form-row">
@@ -537,7 +549,7 @@ $mysqli->close();
         </div>
 
         <div class="slots-section">
-            <h2>📋 Your Time Slots</h2>
+            <h2>Your Time Slots</h2>
 
             <?php if (empty($slots)): ?>
                 <div class="no-slots">

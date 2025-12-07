@@ -460,13 +460,14 @@ $mysqli->close();
         .category-checkbox {
             display: flex;
             align-items: center;
-            padding: 1rem;
+            padding: 0;
             border: 2px solid rgba(139, 92, 246, 0.2);
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             background: rgba(15, 23, 42, 0.5);
             color: #cbd5e1;
+            position: relative;
         }
 
         .category-checkbox:hover {
@@ -478,11 +479,26 @@ $mysqli->close();
         .category-checkbox input[type="checkbox"]:checked + label {
             color: #c4b5fd;
             font-weight: 700;
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.6);
         }
 
         .category-checkbox input[type="checkbox"] {
-            margin-right: 0.5rem;
+            margin: 0;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            margin-left: 1rem;
             cursor: pointer;
+            accent-color: #8b5cf6;
+        }
+
+        .category-checkbox label {
+            flex: 1;
+            padding: 1rem;
+            padding-left: 0.5rem;
+            cursor: pointer;
+            margin: 0;
         }
 
         .profile-image-preview {
@@ -656,7 +672,7 @@ $mysqli->close();
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
-                    💾 Save Profile
+                    Save Profile
                 </button>
             </form>
         </div>

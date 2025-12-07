@@ -314,39 +314,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             margin-top: 0.5rem;
-            position: relative;
-            overflow: hidden;
             letter-spacing: 0.5px;
-            animation: btnGlow 3s ease-in-out infinite;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
         }
 
         .btn:active {
-            transform: translateY(-1px) scale(0.98);
+            transform: translateY(0);
         }
 
         .alert {

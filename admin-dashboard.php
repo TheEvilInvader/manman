@@ -729,40 +729,82 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         <?php endif; ?>
 
         <!-- Statistics Dashboard -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+        </svg>
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">👥</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17 20C17 18.3431 14.7614 17 12 17C9.23858 17 7 18.3431 7 20M21 17C21 15.7635 19.7014 14.7307 18 14.2628M3 17C3 15.7635 4.29859 14.7307 6 14.2628M18 10.2628C19.1652 9.82849 20 8.75849 20 7.5C20 6.24151 19.1652 5.17151 18 4.73717M6 10.2628C4.83481 9.82849 4 8.75849 4 7.5C4 6.24151 4.83481 5.17151 6 4.73717M15 7.5C15 9.433 13.433 11 11.5 11C9.567 11 8 9.433 8 7.5C8 5.567 9.567 4 11.5 4C13.433 4 15 5.567 15 7.5Z" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <div class="stat-value"><?php echo number_format($stats['total_users']); ?></div>
                 <div class="stat-label">Total Users</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">👨‍🏫</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <div class="stat-value"><?php echo number_format($stats['total_mentors']); ?></div>
                 <div class="stat-label">Active Mentors</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">👨‍🎓</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 14C14.2091 14 16 12.2091 16 10C16 7.79086 14.2091 6 12 6C9.79086 6 8 7.79086 8 10C8 12.2091 9.79086 14 12 14Z" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 18C4 16.3431 7.58172 15 12 15C16.4183 15 20 16.3431 20 18M19 4L21 6L19 8" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <div class="stat-value"><?php echo number_format($stats['total_mentees']); ?></div>
                 <div class="stat-label">Mentees</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">📅</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M11.9955 13.7H12.0045M8.29431 13.7H8.30329M8.29431 16.7H8.30329" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <div class="stat-value"><?php echo number_format($stats['total_sessions']); ?></div>
                 <div class="stat-label">Total Sessions</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">✅</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7.75 12L10.58 14.83L16.25 9.17" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <div class="stat-value"><?php echo number_format($stats['completed_sessions']); ?></div>
                 <div class="stat-label">Completed</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">⏳</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 6V12L16 14" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <div class="stat-value"><?php echo number_format($stats['pending_mentors']); ?></div>
                 <div class="stat-label">Pending</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">💰</div>
-                <div class="stat-value">$<?php echo number_format($stats['total_revenue'], 2); ?></div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="url(#iconGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="stat-value">$<?php echo number_format($stats['total_revenue'], 1); ?></div>
                 <div class="stat-label">Total Revenue</div>
             </div>
         </div>
@@ -779,7 +821,7 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         <!-- New Applications Tab -->
         <div id="tab-applications" class="tab-content active">
             <div class="section">
-                <h2>📝 New Mentor Applications</h2>
+                <h2>New Mentor Applications</h2>
                 <p style="color: #64748b; margin-bottom: 1.5rem;">First-time mentor applications awaiting approval</p>
                 <?php if (empty($new_applications)): ?>
                     <div class="no-data">
@@ -851,7 +893,7 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         <!-- Profile Updates Tab -->
         <div id="tab-updates" class="tab-content">
             <div class="section">
-                <h2>🔄 Mentor Profile Update Requests</h2>
+                <h2>Mentor Profile Update Requests</h2>
                 <p style="color: #64748b; margin-bottom: 1.5rem;">Previously approved mentors requesting profile changes - re-approval required</p>
                 <?php if (empty($profile_updates)): ?>
                     <div class="no-data">

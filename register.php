@@ -427,58 +427,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
             background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             color: white;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.2s ease;
             margin-top: 1rem;
-            box-shadow: 
-                0 10px 30px rgba(139, 92, 246, 0.4),
-                0 0 0 0 rgba(139, 92, 246, 0.5);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
             letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
         }
 
         .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 
-                0 20px 50px rgba(139, 92, 246, 0.5),
-                0 0 60px rgba(139, 92, 246, 0.4),
-                0 0 0 6px rgba(139, 92, 246, 0.2);
-            animation: btnGlow 1.5s ease-in-out infinite;
-        }
-
-        @keyframes btnGlow {
-            0%, 100% {
-                box-shadow: 
-                    0 20px 50px rgba(139, 92, 246, 0.5),
-                    0 0 60px rgba(139, 92, 246, 0.4);
-            }
-            50% {
-                box-shadow: 
-                    0 20px 50px rgba(139, 92, 246, 0.7),
-                    0 0 80px rgba(139, 92, 246, 0.6);
-            }
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
         }
 
         .btn:active {
-            transform: translateY(-1px) scale(0.98);
+            transform: translateY(0);
         }
 
         .alert {

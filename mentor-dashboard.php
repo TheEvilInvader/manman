@@ -461,7 +461,19 @@ $mysqli->close();
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">🎓 MentorBridge</div>
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px; display: inline-block; vertical-align: middle; margin-right: 8px;">
+                <path d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z" stroke="url(#logoGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 6L17 8L19 9L17 10L16 12L15 10L13 9L15 8L16 6Z" stroke="url(#logoGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            MentorBridge
+        </div>
         <div class="nav-buttons">
             <a href="mentor-profile.php" class="btn btn-secondary">Profile Editing</a>
             <a href="manage-availability.php" class="btn btn-secondary">Manage Availability</a>
@@ -471,8 +483,8 @@ $mysqli->close();
 
     <div class="container">
         <div class="header">
-            <h1>👋 Welcome, <?php echo htmlspecialchars($profile['full_name']); ?>!</h1>
-            <p style="color: #64748b;">Manage your mentorship sessions and track your progress</p>
+            <h1>Welcome, <?php echo htmlspecialchars($profile['full_name']); ?>!</h1>
+            <p style="color: #94a3b8;">Manage your mentorship sessions and track your progress</p>
         </div>
 
         <?php if ($success): ?>
@@ -503,10 +515,10 @@ $mysqli->close();
         </div>
 
         <div class="section">
-            <h2>📅 Upcoming Sessions</h2>
+            <h2>Upcoming Sessions</h2>
             <?php if (empty($upcoming_sessions)): ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon">📭</div>
+                    <div class="empty-state-icon">💭</div>
                     <h3>No upcoming sessions</h3>
                     <p>Your booked sessions will appear here</p>
                 </div>
@@ -523,10 +535,10 @@ $mysqli->close();
                             </span>
                         </div>
                         <div class="session-details">
-                            <p><strong>📅 Date:</strong> <?php echo date('M d, Y', strtotime($session['scheduled_at'])); ?></p>
-                            <p><strong>🕐 Time:</strong> <?php echo date('g:i A', strtotime($session['scheduled_at'])); ?></p>
-                            <p><strong>💰 Amount:</strong> $<?php echo number_format($session['amount'], 2); ?></p>
-                            <p><strong>💳 Payment:</strong> <?php echo ucfirst($session['payment_status']); ?></p>
+                            <p><strong>Date:</strong> <?php echo date('M d, Y', strtotime($session['scheduled_at'])); ?></p>
+                            <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($session['scheduled_at'])); ?></p>
+                            <p><strong>Amount:</strong> $<?php echo number_format($session['amount'], 2); ?></p>
+                            <p><strong>Payment:</strong> <?php echo ucfirst($session['payment_status']); ?></p>
                         </div>
                         <?php if ($session['status'] === 'confirmed' || $session['status'] === 'pending'): ?>
                             <div class="session-actions">
@@ -543,7 +555,7 @@ $mysqli->close();
         </div>
 
         <div class="section">
-            <h2>✅ Completed Sessions</h2>
+            <h2>Completed Sessions</h2>
             <?php if (empty($completed_sessions)): ?>
                 <div class="empty-state">
                     <div class="empty-state-icon">📝</div>
@@ -561,19 +573,19 @@ $mysqli->close();
                             <span class="status-badge status-completed">Completed</span>
                         </div>
                         <div class="session-details">
-                            <p><strong>📅 Date:</strong> <?php echo date('M d, Y', strtotime($session['scheduled_at'])); ?></p>
-                            <p><strong>🕐 Time:</strong> <?php echo date('g:i A', strtotime($session['scheduled_at'])); ?></p>
-                            <p><strong>💰 Amount:</strong> $<?php echo number_format($session['amount'], 2); ?></p>
+                            <p><strong>Date:</strong> <?php echo date('M d, Y', strtotime($session['scheduled_at'])); ?></p>
+                            <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($session['scheduled_at'])); ?></p>
+                            <p><strong>Amount:</strong> $<?php echo number_format($session['amount'], 2); ?></p>
                         </div>
                         <?php if ($session['rating']): ?>
                             <div class="feedback-box">
-                                <h4 style="color: var(--color-primary-dark); margin-bottom: 0.5rem;">⭐ Mentee Feedback</h4>
+                                <h4 style="background: linear-gradient(135deg, #a78bfa, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; font-weight: 700;">Mentee Feedback</h4>
                                 <div class="stars">
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
                                         <?php echo $i <= $session['rating'] ? '★' : '☆'; ?>
                                     <?php endfor; ?>
                                 </div>
-                                <p style="color: #475569;"><?php echo htmlspecialchars($session['feedback_comment']); ?></p>
+                                <p style="color: #cbd5e1;"><?php echo htmlspecialchars($session['feedback_comment']); ?></p>
                             </div>
                         <?php endif; ?>
                     </div>

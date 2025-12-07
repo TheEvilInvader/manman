@@ -518,10 +518,22 @@ $mysqli->close();
 </head>
 <body>
     <nav class="nav-bar">
-        <div class="logo">🎓 MentorBridge</div>
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px; display: inline-block; vertical-align: middle; margin-right: 8px;">
+                <path d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z" stroke="url(#logoGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 6L17 8L19 9L17 10L16 12L15 10L13 9L15 8L16 6Z" stroke="url(#logoGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            MentorBridge
+        </div>
         <div class="nav-buttons">
-            <a href="my-sessions.php" class="btn btn-primary" style="background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));">My Sessions</a>
-            <span style="color: #666;">👤 <?php echo htmlspecialchars($mentee_profile['full_name']); ?></span>
+            <a href="my-sessions.php" class="btn btn-primary" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 0.75rem 1.5rem; border: 1px solid rgba(139, 92, 246, 0.3); box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);">My Sessions</a>
+            <span style="color: #c7d2fe; padding: 0.75rem 1.5rem; background: rgba(30, 27, 75, 0.6); border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.3); font-weight: 600;"><?php echo htmlspecialchars($mentee_profile['full_name']); ?></span>
             <a href="logout.php" class="btn btn-secondary">Logout</a>
         </div>
     </nav>
@@ -568,13 +580,13 @@ $mysqli->close();
         <?php if ($selected_category || $search_query): ?>
         <div class="mentors-section">
             <div class="filter-bar">
-                <div>
-                    <strong>Found <?php echo count($mentors); ?> mentor(s)</strong>
+                <div style="color: #e0e7ff; font-weight: 600;">
+                    Found <span style="color: #a78bfa; font-size: 1.2em;"><?php echo count($mentors); ?></span> mentor(s)
                     <?php if ($selected_category): 
                         $cat = array_values(array_filter($categories, fn($c) => $c['id'] == $selected_category))[0] ?? null;
                         if ($cat):
                     ?>
-                        in <span style="color: #667eea;"><?php echo $cat['icon'] . ' ' . htmlspecialchars($cat['name']); ?></span>
+                        in <span style="color: #8b5cf6; font-weight: 700;"><?php echo $cat['icon'] . ' ' . htmlspecialchars($cat['name']); ?></span>
                     <?php endif; endif; ?>
                 </div>
                 <a href="mentee-dashboard.php" class="btn btn-secondary">← Back to Categories</a>
