@@ -114,7 +114,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             justify-content: center;
             padding: 20px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Custom Scrollbar */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
         }
 
         body::before {
@@ -155,8 +174,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 0 20px 60px rgba(0, 0, 0, 0.5),
                 inset 0 0 0 1px rgba(167, 139, 250, 0.2);
             width: 100%;
-            max-width: 520px;
-            padding: 3rem;
+            max-width: 550px;
+            padding: 2.5rem;
             animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             z-index: 10;
@@ -586,7 +605,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="index.php">← Back to Home</a>
         </div>
         
-        <div class="logo">✨</div>
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 48px; height: 48px;">
+                <path d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z" stroke="url(#logoGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 6L17 8L19 9L17 10L16 12L15 10L13 9L15 8L16 6Z" stroke="url(#logoGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
         <h1>Create Account</h1>
         <p class="subtitle">Join MentorBridge and start your journey</p>
 

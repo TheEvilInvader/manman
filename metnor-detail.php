@@ -70,6 +70,7 @@ $mysqli->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($mentor['full_name']); ?> - MentorBridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -78,32 +79,53 @@ $mysqli->close();
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
         }
 
         .nav-bar {
-            background: white;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .logo {
             font-size: 1.5rem;
             font-weight: bold;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
         }
 
         .btn {
             padding: 0.6rem 1.5rem;
             border: none;
-            border-radius: 25px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
             text-decoration: none;
@@ -112,18 +134,24 @@ $mysqli->close();
         }
 
         .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 92, 246, 0.3);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
         }
 
         .container {
@@ -133,7 +161,7 @@ $mysqli->close();
         }
 
         .back-link {
-            color: white;
+            color: #a78bfa;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -143,6 +171,7 @@ $mysqli->close();
         }
 
         .back-link:hover {
+            color: #c4b5fd;
             text-decoration: underline;
         }
 
@@ -153,10 +182,12 @@ $mysqli->close();
         }
 
         .profile-main {
-            background: white;
-            border-radius: 15px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
             padding: 2.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
         }
 
         .profile-header {
@@ -164,7 +195,7 @@ $mysqli->close();
             gap: 2rem;
             margin-bottom: 2rem;
             padding-bottom: 2rem;
-            border-bottom: 2px solid #f0f0f0;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.2);
         }
 
         .profile-avatar {
@@ -189,7 +220,9 @@ $mysqli->close();
 
         .profile-info h1 {
             font-size: 2.5rem;
-            color: #667eea;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 1rem;
         }
 
@@ -207,7 +240,7 @@ $mysqli->close();
 
         .rating-text-large {
             font-size: 1.2rem;
-            color: #666;
+            color: #94a3b8;
         }
 
         .category-badges {
@@ -236,13 +269,15 @@ $mysqli->close();
         }
 
         .section h2 {
-            color: #667eea;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-size: 1.8rem;
             margin-bottom: 1rem;
         }
 
         .section-content {
-            color: #666;
+            color: #94a3b8;
             line-height: 1.8;
             font-size: 1.1rem;
         }
@@ -254,8 +289,9 @@ $mysqli->close();
         }
 
         .skill-tag {
-            background: #f3f4f6;
-            color: #667eea;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
             padding: 0.5rem 1rem;
             border-radius: 20px;
         }
@@ -265,9 +301,10 @@ $mysqli->close();
         }
 
         .review-card {
-            background: #f8f9fa;
+            background: rgba(30, 27, 75, 0.6);
+            border: 1px solid rgba(139, 92, 246, 0.2);
             padding: 1.5rem;
-            border-radius: 10px;
+            border-radius: 14px;
             margin-bottom: 1rem;
         }
 
@@ -298,19 +335,24 @@ $mysqli->close();
         }
 
         .booking-sidebar {
-            background: white;
-            border-radius: 15px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
             padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
             position: sticky;
             top: 2rem;
             height: fit-content;
         }
 
         .booking-sidebar h3 {
-            color: #667eea;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 1.5rem;
             font-size: 1.5rem;
+            font-weight: 800;
         }
 
         .time-slots {
@@ -323,7 +365,7 @@ $mysqli->close();
 
         .day-name {
             font-weight: 600;
-            color: #333;
+            color: #c7d2fe;
             margin-bottom: 0.8rem;
         }
 
@@ -335,42 +377,48 @@ $mysqli->close();
 
         .time-btn {
             padding: 0.6rem;
-            border: 2px solid #e0e0e0;
+            border: 2px solid rgba(139, 92, 246, 0.3);
             border-radius: 10px;
-            background: white;
+            background: rgba(30, 27, 75, 0.6);
+            color: #e0e7ff;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.95rem;
         }
 
         .time-btn:hover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
+            border-color: rgba(139, 92, 246, 0.5);
+            background: rgba(30, 27, 75, 0.8);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
         }
 
         .time-btn.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
         }
 
         .booking-summary {
-            background: #f8f9fa;
+            background: rgba(30, 27, 75, 0.6);
             padding: 1rem;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 1rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.5rem;
-            color: #666;
+            color: #94a3b8;
         }
 
         .summary-row.total {
             font-weight: bold;
-            color: #333;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-size: 1.2rem;
             padding-top: 0.5rem;
             border-top: 2px solid #e0e0e0;
@@ -509,9 +557,9 @@ $mysqli->close();
                     <input type="hidden" name="mentor_id" value="<?php echo $mentor['id']; ?>">
                     
                     <div class="time-slots">
-                        <p style="color: #666; margin-bottom: 1rem;">Select a date and time:</p>
+                        <p style="color: #94a3b8; margin-bottom: 1rem;">Select a date and time:</p>
                         <?php if (empty($available_times)): ?>
-                            <div style="text-align: center; padding: 2rem; color: #999;">
+                            <div style="text-align: center; padding: 2rem; color: #94a3b8;">
                                 <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
                                 <p>No available time slots at the moment.</p>
                                 <p style="font-size: 0.9rem; margin-top: 0.5rem;">Please check back later.</p>

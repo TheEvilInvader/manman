@@ -99,17 +99,8 @@ $mysqli->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mentor Dashboard - MentorBridge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --color-primary: #638ECB;
-            --color-primary-light: #8AAEE0;
-            --color-primary-dark: #395886;
-            --color-bg: #F0F3FA;
-            --color-bg-light: #D5DEEF;
-            --color-card: #FFFFFF;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -117,24 +108,82 @@ $mysqli->close();
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--color-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
+        }
+
+        /* Floating Gradient Orbs */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
         }
 
         .navbar {
-            background: var(--color-card);
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 1.25rem 2.5rem;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--color-primary-dark);
+            font-size: 1.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
         }
 
         .nav-buttons {
@@ -150,35 +199,41 @@ $mysqli->close();
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-primary {
-            background: var(--color-primary);
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
             color: white;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
         }
 
         .btn-primary:hover {
-            background: var(--color-primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 142, 203, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(139, 92, 246, 0.5);
         }
 
         .btn-secondary {
-            background: var(--color-bg-light);
-            color: var(--color-primary-dark);
+            background: rgba(139, 92, 246, 0.15);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         .btn-secondary:hover {
-            background: var(--color-primary-light);
-            color: white;
+            background: rgba(139, 92, 246, 0.25);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
         }
 
         .container {
             max-width: 1400px;
             margin: 2rem auto;
             padding: 0 2rem;
+            position: relative;
+            z-index: 10;
         }
 
         .header {
@@ -186,9 +241,12 @@ $mysqli->close();
         }
 
         .header h1 {
-            color: var(--color-primary-dark);
-            font-size: 2rem;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
             margin-bottom: 0.5rem;
+            font-weight: 900;
         }
 
         .stats-grid {
@@ -199,45 +257,72 @@ $mysqli->close();
         }
 
         .stat-card {
-            background: var(--color-card);
-            padding: 1.5rem;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.4), 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
         }
 
         .stat-card h3 {
-            color: #64748b;
+            color: #94a3b8;
             font-size: 0.9rem;
             font-weight: 500;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .stat-card .value {
-            color: var(--color-primary-dark);
-            font-size: 2rem;
-            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            font-weight: 900;
         }
 
         .section {
-            background: var(--color-card);
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
             margin-bottom: 2rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .section h2 {
-            color: var(--color-primary-dark);
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 1.5rem;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 800;
         }
 
         .session-card {
-            background: var(--color-bg);
+            background: rgba(30, 27, 75, 0.6);
+            backdrop-filter: blur(10px);
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 16px;
             margin-bottom: 1rem;
-            border-left: 4px solid var(--color-primary);
+            border-left: 4px solid #8b5cf6;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            background: rgba(30, 27, 75, 0.8);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
         }
 
         .session-header {
@@ -248,35 +333,43 @@ $mysqli->close();
         }
 
         .mentee-info h3 {
-            color: var(--color-primary-dark);
-            margin-bottom: 0.25rem;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
         }
 
         .mentee-info p {
-            color: #64748b;
+            color: #94a3b8;
             font-size: 0.9rem;
         }
 
         .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .status-pending {
-            background: #fef3c7;
-            color: #92400e;
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
         }
 
         .status-confirmed {
-            background: #dbeafe;
-            color: #1e40af;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
         .status-completed {
-            background: #d1fae5;
-            color: #065f46;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .session-details {
@@ -287,7 +380,7 @@ $mysqli->close();
         }
 
         .session-details p {
-            color: #475569;
+            color: #cbd5e1;
         }
 
         .session-actions {
@@ -297,43 +390,72 @@ $mysqli->close();
         }
 
         .feedback-box {
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 8px;
+            background: rgba(30, 27, 75, 0.5);
+            padding: 1.2rem;
+            border-radius: 12px;
             margin-top: 1rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .stars {
             color: #fbbf24;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.5));
         }
 
         .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
+            padding: 1.1rem 1.5rem;
+            border-radius: 14px;
             margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+            border: 1px solid;
         }
 
         .alert-success {
-            background: #d1fae5;
-            color: #065f46;
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border-color: rgba(34, 197, 94, 0.3);
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.2);
         }
 
         .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
         }
 
         .empty-state {
             text-align: center;
             padding: 3rem;
-            color: #64748b;
+            color: #94a3b8;
         }
 
         .empty-state-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.3));
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 1.5rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .session-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
         }
     </style>
 </head>

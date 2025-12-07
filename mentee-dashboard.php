@@ -73,6 +73,9 @@ $mysqli->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find a Mentor - MentorBridge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -81,26 +84,82 @@ $mysqli->close();
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
+        }
+
+        /* Floating Gradient Orbs */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
         }
 
         .nav-bar {
-            background: white;
-            padding: 1rem 2rem;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 1.25rem 2.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
+            position: relative;
+            z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            font-size: 1.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
         }
 
         .nav-buttons {
@@ -110,29 +169,36 @@ $mysqli->close();
         }
 
         .btn {
-            padding: 0.6rem 1.5rem;
+            padding: 0.7rem 1.5rem;
             border: none;
-            border-radius: 25px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
             text-decoration: none;
             display: inline-block;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
+            background: rgba(139, 92, 246, 0.15);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         .btn-secondary:hover {
-            background: #e0e0e0;
+            background: rgba(139, 92, 246, 0.25);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
+            position: relative;
+            z-index: 10;
         }
 
         .hero-section {
@@ -144,11 +210,15 @@ $mysqli->close();
         .hero-section h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
         }
 
         .hero-section p {
             font-size: 1.3rem;
-            opacity: 0.9;
+            color: #a5b4fc;
             margin-bottom: 2rem;
         }
 
@@ -160,16 +230,26 @@ $mysqli->close();
 
         .search-bar input {
             width: 100%;
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 50px;
+            padding: 1.2rem 1.5rem;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
             font-size: 1.1rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            color: #e0e7ff;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.4s ease;
         }
 
         .search-bar input:focus {
             outline: none;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15), 0 0 40px rgba(139, 92, 246, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .search-bar input::placeholder {
+            color: #64748b;
         }
 
         .categories-section {
@@ -178,9 +258,12 @@ $mysqli->close();
 
         .section-title {
             text-align: center;
-            color: white;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-size: 2rem;
             margin-bottom: 2rem;
+            font-weight: 800;
         }
 
         .categories-grid {
@@ -190,41 +273,46 @@ $mysqli->close();
         }
 
         .category-card {
-            background: white;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
             padding: 2rem;
-            border-radius: 15px;
+            border-radius: 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
             color: inherit;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 2px solid rgba(139, 92, 246, 0.2);
         }
 
         .category-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 50px rgba(139, 92, 246, 0.3), 0 0 60px rgba(99, 102, 241, 0.2);
+            border-color: rgba(139, 92, 246, 0.5);
         }
 
         .category-card.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.3));
+            border-color: #8b5cf6;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
         }
 
         .category-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
         }
 
         .category-name {
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 0.5rem;
+            color: #e0e7ff;
         }
 
         .category-desc {
             font-size: 0.9rem;
-            opacity: 0.7;
+            color: #94a3b8;
         }
 
         .mentors-section {
@@ -238,17 +326,20 @@ $mysqli->close();
         }
 
         .mentor-card {
-            background: white;
-            border-radius: 15px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
             padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), inset 0 0 0 1px rgba(139, 92, 246, 0.1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .mentor-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.4), 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
         }
 
         .mentor-header {
@@ -261,13 +352,14 @@ $mysqli->close();
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
             color: white;
             flex-shrink: 0;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
         }
 
         .mentor-avatar img {
@@ -283,8 +375,10 @@ $mysqli->close();
 
         .mentor-name {
             font-size: 1.3rem;
-            font-weight: 600;
-            color: #667eea;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
         }
 
@@ -298,10 +392,11 @@ $mysqli->close();
         .stars {
             color: #fbbf24;
             font-size: 1.2rem;
+            filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.5));
         }
 
         .rating-text {
-            color: #666;
+            color: #94a3b8;
             font-size: 0.9rem;
         }
 
@@ -313,15 +408,16 @@ $mysqli->close();
         }
 
         .category-badge {
-            background: #f3f4f6;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
+            background: rgba(139, 92, 246, 0.2);
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
             font-size: 0.85rem;
-            color: #667eea;
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         .mentor-bio {
-            color: #666;
+            color: #cbd5e1;
             line-height: 1.6;
             margin-bottom: 1rem;
             display: -webkit-box;
@@ -331,7 +427,7 @@ $mysqli->close();
         }
 
         .mentor-skills {
-            color: #999;
+            color: #94a3b8;
             font-size: 0.9rem;
             margin-bottom: 1rem;
         }
@@ -341,46 +437,55 @@ $mysqli->close();
             justify-content: space-between;
             align-items: center;
             padding-top: 1rem;
-            border-top: 1px solid #f0f0f0;
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .hourly-rate {
             font-size: 1.5rem;
-            font-weight: 600;
-            color: #667eea;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .btn-view {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
             color: white;
-            padding: 0.7rem 1.5rem;
-            border-radius: 25px;
+            padding: 0.8rem 1.8rem;
+            border-radius: 12px;
             text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-weight: 700;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
         }
 
         .btn-view:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(139, 92, 246, 0.5);
         }
 
         .no-results {
             text-align: center;
-            color: white;
+            color: #a5b4fc;
             font-size: 1.3rem;
             padding: 3rem;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .filter-bar {
-            background: white;
-            padding: 1rem 2rem;
-            border-radius: 15px;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 2rem;
+            border-radius: 20px;
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -399,6 +504,14 @@ $mysqli->close();
             .filter-bar {
                 flex-direction: column;
                 gap: 1rem;
+            }
+
+            .nav-bar {
+                padding: 1rem 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
             }
         }
     </style>

@@ -58,57 +58,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment - MentorBridge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --color-primary: #638ECB;
-            --color-primary-dark: #395886;
-            --color-bg-light: #F0F3FA;
-        }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--color-bg-light) 0%, #D5DEEF 100%);
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
         }
         
         .payment-container {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
             padding: 3rem;
-            border-radius: 20px;
+            border-radius: 24px;
             max-width: 500px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(99, 142, 203, 0.2);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), 0 20px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 1;
         }
         
         h1 {
-            color: var(--color-primary-dark);
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-align: center;
             margin-bottom: 2rem;
             font-size: 2rem;
-        }
-        
-        .session-time {
-            font-size: 0.95rem;
-            color: #555;
+            font-weight: 900;
         }
         
         .booking-details {
-            background: var(--color-bg-light);
+            background: rgba(30, 27, 75, 0.6);
+            border: 1px solid rgba(139, 92, 246, 0.2);
             padding: 1.5rem;
-            border-radius: 12px;
+            border-radius: 16px;
             margin-bottom: 2rem;
         }
         
         .session-time {
             font-size: 0.9rem;
-            color: #666;
+            color: #94a3b8;
             margin-top: 0.25rem;
         }
         
@@ -116,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
             display: flex;
             justify-content: space-between;
             margin-bottom: 1rem;
-            color: #666;
+            color: #94a3b8;
         }
         
         .detail-row:last-child {
@@ -124,24 +140,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
         }
         
         .detail-row strong {
-            color: #333;
+            color: #c7d2fe;
         }
         
         .total {
             font-size: 1.5rem;
-            color: var(--color-primary);
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-weight: bold;
             padding-top: 1rem;
-            border-top: 2px solid #e0e0e0;
+            border-top: 2px solid rgba(139, 92, 246, 0.3);
             margin-top: 1rem;
         }
         
         .payment-note {
-            background: #fff3cd;
+            background: rgba(234, 179, 8, 0.15);
+            border: 1px solid rgba(234, 179, 8, 0.3);
             padding: 1rem;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 2rem;
-            color: #856404;
+            color: #fde047;
             text-align: center;
         }
         
@@ -153,24 +172,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(99, 142, 203, 0.3);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
         }
         
         .btn-secondary {
-            background: var(--color-bg-light);
-            color: var(--color-primary-dark);
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: #c4b5fd;
             margin-top: 1rem;
         }
         
         .btn-secondary:hover {
-            background: #D5DEEF;
+            background: rgba(139, 92, 246, 0.3);
         }
         
         .payment-methods {

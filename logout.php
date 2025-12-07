@@ -15,7 +15,7 @@ if (isset($_COOKIE[session_name()])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logging Out - MentorBridge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -23,32 +23,58 @@ if (isset($_COOKIE[session_name()])) {
             box-sizing: border-box;
         }
 
-        :root {
-            --color-1: #F0F3FA;
-            --color-2: #D5DEEF;
-            --color-3: #B1C9EF;
-            --color-4: #8AAEE0;
-            --color-5: #638ECB;
-            --color-6: #395886;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--color-1) 0%, var(--color-2) 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
         }
 
         .logout-container {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
             padding: 3rem;
             border-radius: 24px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(57, 88, 134, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 100px rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
             animation: fadeIn 0.5s ease;
             max-width: 450px;
+            position: relative;
+            z-index: 1;
         }
 
         @keyframes fadeIn {
@@ -65,13 +91,14 @@ if (isset($_COOKIE[session_name()])) {
         .logout-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, var(--color-5), var(--color-6));
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1.5rem;
             animation: wave 1.5s ease infinite;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
         }
 
         .logout-icon svg {
@@ -85,14 +112,16 @@ if (isset($_COOKIE[session_name()])) {
         }
 
         h1 {
-            color: var(--color-6);
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 1rem;
             font-size: 2rem;
             font-weight: 700;
         }
 
         p {
-            color: #4a5568;
+            color: #94a3b8;
             margin-bottom: 2rem;
             line-height: 1.6;
         }

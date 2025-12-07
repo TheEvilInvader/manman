@@ -47,96 +47,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - MentorBridge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --color-primary: #6366f1;
+            --color-primary-dark: #4f46e5;
+            --color-secondary: #8b5cf6;
+            --color-accent: #a78bfa;
+            --color-neon: #c084fc;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --color-1: #F0F3FA;
-            --color-2: #D5DEEF;
-            --color-3: #B1C9EF;
-            --color-4: #8AAEE0;
-            --color-5: #638ECB;
-            --color-6: #395886;
-            --white: #ffffff;
-            --text-dark: #1a202c;
-            --text-light: #4a5568;
-            --shadow: rgba(57, 88, 134, 0.1);
-            --shadow-hover: rgba(57, 88, 134, 0.2);
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--color-1) 0%, var(--color-2) 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
-        /* Animated Background */
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
+        /* Custom Scrollbar */
+        body::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .bg-circle {
+        body::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
+        }
+
+        body::before {
+            content: '';
             position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
             border-radius: 50%;
-            opacity: 0.15;
+            top: -250px;
+            right: -250px;
             animation: float 20s infinite ease-in-out;
         }
 
-        .circle-1 {
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(135deg, var(--color-4), var(--color-5));
-            top: -150px;
-            right: -150px;
-        }
-
-        .circle-2 {
-            width: 250px;
-            height: 250px;
-            background: linear-gradient(135deg, var(--color-3), var(--color-4));
-            bottom: -125px;
-            left: -125px;
-            animation-delay: 5s;
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s infinite ease-in-out reverse;
         }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, 30px) scale(1.1); }
-        }
-
-        .login-container {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px var(--shadow-hover);
-            width: 100%;
-            max-width: 450px;
-            padding: 3rem;
-            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            z-index: 1;
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -50px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(40px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -144,26 +137,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        .logo-section {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--color-5), var(--color-6));
-            border-radius: 18px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            animation: pulse 2s ease infinite;
-        }
-
-        .logo-icon svg {
-            width: 35px;
-            height: 35px;
+        @keyframes glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         @keyframes pulse {
@@ -171,19 +147,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             50% { transform: scale(1.05); }
         }
 
+        @keyframes btnGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(99, 102, 241, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.6), 0 0 60px rgba(99, 102, 241, 0.3); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-container {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 100px rgba(139, 92, 246, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(99, 102, 241, 0.2), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .back-home {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-home a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .back-home a:hover {
+            color: #c4b5fd;
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateX(-5px);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+            animation: glow 3s ease-in-out infinite;
+        }
+
         h1 {
             text-align: center;
-            color: var(--color-6);
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 30px rgba(167, 139, 250, 0.5);
         }
 
         .subtitle {
             text-align: center;
-            color: var(--text-light);
-            margin-bottom: 2rem;
+            color: #a5b4fc;
+            margin-bottom: 2.5rem;
             font-size: 0.95rem;
+            font-weight: 400;
         }
 
         .form-group {
@@ -192,129 +253,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         label {
             display: block;
-            margin-bottom: 0.6rem;
-            color: var(--text-dark);
+            margin-bottom: 0.7rem;
+            color: #c4b5fd;
             font-weight: 600;
             font-size: 0.9rem;
+            letter-spacing: 0.3px;
         }
 
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 0.95rem 1.2rem;
-            border: 2px solid var(--color-2);
-            border-radius: 12px;
+            padding: 1rem 1.3rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 14px;
             font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'Inter', sans-serif;
-            background: var(--color-1);
+            background: rgba(30, 27, 75, 0.6);
+            color: #e0e7ff;
+            font-weight: 500;
+        }
+
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #64748b;
         }
 
         input:focus {
             outline: none;
-            border-color: var(--color-5);
-            box-shadow: 0 0 0 4px rgba(99, 142, 203, 0.1);
-            background: white;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 1.1rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            cursor: pointer;
-            background: linear-gradient(135deg, var(--color-5), var(--color-6));
-            color: white;
-            transition: all 0.3s ease;
-            margin-top: 0.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(57, 88, 134, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .alert {
-            padding: 1rem 1.2rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            animation: shake 0.5s ease;
-            background: #fee;
-            color: #c33;
-            border-left: 4px solid #c33;
-            font-size: 0.9rem;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-
-        .links-section {
-            margin-top: 1.5rem;
-        }
-
-        .register-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: var(--text-light);
-            font-size: 0.95rem;
-        }
-
-        .register-link a {
-            color: var(--color-5);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .register-link a:hover {
-            color: var(--color-6);
-            text-decoration: underline;
-        }
-
-        .back-home {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .back-home a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            transition: all 0.3s ease;
-        }
-
-        .back-home a:hover {
-            color: var(--color-6);
-            transform: translateX(-4px);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1), 0 0 30px rgba(139, 92, 246, 0.3);
+            background: rgba(30, 27, 75, 0.8);
+            transform: translateY(-1px);
         }
 
         .forgot-password {
@@ -323,49 +293,146 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .forgot-password a {
-            color: var(--text-light);
+            color: #94a3b8;
             text-decoration: none;
             font-size: 0.85rem;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .forgot-password a:hover {
-            color: var(--color-5);
+            color: #c4b5fd;
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            animation: btnGlow 3s ease-in-out infinite;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .alert {
+            padding: 1.1rem 1.5rem;
+            border-radius: 14px;
+            margin-bottom: 1.5rem;
+            animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            font-weight: 500;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .register-link a {
+            color: #a78bfa;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .register-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            transition: width 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #c4b5fd;
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+        }
+
+        .register-link a:hover::after {
+            width: 100%;
         }
 
         @media (max-width: 768px) {
             .login-container {
-                padding: 2rem 1.5rem;
+                padding: 2rem;
             }
             
             h1 {
                 font-size: 1.75rem;
             }
+
+            .logo {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="animated-bg">
-        <div class="bg-circle circle-1"></div>
-        <div class="bg-circle circle-2"></div>
-    </div>
-
     <div class="login-container">
         <div class="back-home">
             <a href="index.php">← Back to Home</a>
         </div>
         
-        <div class="logo-section">
-            <div class="logo-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                    <path d="M2 17l10 5 10-5"></path>
-                    <path d="M2 12l10 5 10-5"></path>
-                </svg>
-            </div>
-            <h1>Welcome Back</h1>
-            <p class="subtitle">Login to your MentorBridge account</p>
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 48px; height: 48px;">
+                <path d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z" stroke="url(#logoGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 6L17 8L19 9L17 10L16 12L15 10L13 9L15 8L16 6Z" stroke="url(#logoGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
         </div>
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Login to your MentorBridge account</p>
 
         <?php if ($error): ?>
             <div class="alert"><?php echo htmlspecialchars($error); ?></div>
@@ -374,7 +441,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="Enter your email">
+                <input type="email" id="email" name="email" required placeholder="your@email.com">
             </div>
 
             <div class="form-group">
@@ -392,18 +459,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Don't have an account? <a href="register.php">Sign up here</a>
         </div>
     </div>
-
-    <script>
-        // Add input animation
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'translateY(-2px)';
-            });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'translateY(0)';
-            });
-        });
-    </script>
 </body>
 </html>

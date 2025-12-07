@@ -157,22 +157,8 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
     <title>Admin Dashboard - MentorBridge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --color-primary: #638ECB;
-            --color-primary-dark: #395886;
-            --color-primary-light: #8AAEE0;
-            --color-accent: #B1C9EF;
-            --color-bg-light: #F0F3FA;
-            --color-bg-lighter: #D5DEEF;
-            --color-success: #10b981;
-            --color-danger: #ef4444;
-            --color-warning: #f59e0b;
-            --color-text: #1e293b;
-            --color-text-light: #64748b;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -181,31 +167,86 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
             min-height: 100vh;
             padding: 20px;
-            color: var(--color-text);
+            color: #e0e7ff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+            border-radius: 50%;
+            top: -300px;
+            right: -300px;
+            animation: float 25s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+            border-radius: 50%;
+            bottom: -250px;
+            left: -250px;
+            animation: float 20s ease-in-out infinite reverse;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(50px, -50px) rotate(120deg); }
+            66% { transform: translate(-30px, 30px) rotate(240deg); }
         }
 
         .nav-bar {
-            background: white;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
             padding: 1.5rem 2.5rem;
             border-radius: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.15);
-            border: 1px solid rgba(99, 142, 203, 0.1);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+            z-index: 10;
         }
 
         .logo {
             font-size: 1.8rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
         }
 
         .nav-actions {
@@ -215,17 +256,20 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .admin-badge {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 50px;
             font-size: 0.85rem;
             font-weight: 600;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .stats-grid {
@@ -236,13 +280,14 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .stat-card {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
             padding: 2rem;
             border-radius: 20px;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.08);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
             transition: all 0.3s ease;
-            border: 1px solid rgba(99, 142, 203, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -254,14 +299,14 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 15px 50px rgba(99, 142, 203, 0.15);
+            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.4);
         }
 
         .stat-card:hover::before {
@@ -277,7 +322,7 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         .stat-value {
             font-size: 3rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
@@ -286,7 +331,7 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .stat-label {
-            color: var(--color-text-light);
+            color: #94a3b8;
             font-size: 0.9rem;
             font-weight: 500;
             text-transform: uppercase;
@@ -294,16 +339,19 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .section {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
             padding: 2.5rem;
             border-radius: 20px;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(99, 142, 203, 0.08);
-            border: 1px solid rgba(99, 142, 203, 0.1);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
 
         .section h2 {
-            color: var(--color-primary-dark);
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 2rem;
             font-size: 1.75rem;
             font-weight: 700;
@@ -314,17 +362,17 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .mentor-item {
-            border: 2px solid var(--color-bg-lighter);
+            border: 2px solid rgba(139, 92, 246, 0.3);
             padding: 2rem;
             border-radius: 16px;
             margin-bottom: 1.5rem;
             transition: all 0.3s ease;
-            background: linear-gradient(135deg, rgba(240, 243, 250, 0.3), rgba(255, 255, 255, 0.9));
+            background: rgba(30, 27, 75, 0.6);
         }
 
         .mentor-item:hover {
-            border-color: var(--color-primary-light);
-            box-shadow: 0 8px 30px rgba(99, 142, 203, 0.15);
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
             transform: translateY(-2px);
         }
 
@@ -336,21 +384,21 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .mentor-info h3 {
-            color: var(--color-primary-dark);
+            color: #c4b5fd;
             margin-bottom: 0.5rem;
             font-size: 1.3rem;
             font-weight: 700;
         }
 
         .mentor-email {
-            color: var(--color-text-light);
+            color: #94a3b8;
             font-size: 0.95rem;
             margin-bottom: 0.5rem;
             font-weight: 500;
         }
 
         .mentor-meta {
-            color: var(--color-text-light);
+            color: #94a3b8;
             font-size: 0.9rem;
             font-weight: 500;
         }
@@ -396,15 +444,15 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .btn-secondary {
-            background: var(--color-bg-light);
-            color: var(--color-primary-dark);
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
             font-weight: 600;
-            border: 2px solid transparent;
+            border: 2px solid rgba(139, 92, 246, 0.3);
         }
 
         .btn-secondary:hover {
-            background: white;
-            border-color: var(--color-primary-light);
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.6);
             transform: translateY(-2px);
         }
 
@@ -423,7 +471,8 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .mentor-details {
-            background: var(--color-bg-light);
+            background: rgba(30, 27, 75, 0.4);
+            border: 1px solid rgba(139, 92, 246, 0.2);
             padding: 1.5rem;
             border-radius: 12px;
             margin-top: 1rem;
@@ -431,7 +480,7 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
 
         .detail-row {
             margin-bottom: 1rem;
-            color: var(--color-text);
+            color: #94a3b8;
             line-height: 1.6;
         }
 
@@ -440,7 +489,7 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .detail-row strong {
-            color: var(--color-primary-dark);
+            color: #c7d2fe;
             font-weight: 600;
             display: block;
             margin-bottom: 0.5rem;
@@ -454,8 +503,9 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .skill-tag {
-            background: var(--color-accent);
-            color: var(--color-primary-dark);
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
             padding: 0.4rem 1rem;
             border-radius: 20px;
             font-size: 0.85rem;
@@ -470,12 +520,13 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .category-tag {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             padding: 0.4rem 1rem;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
         }
 
         .alert {
@@ -498,9 +549,9 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 2px solid #6ee7b7;
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border: 2px solid rgba(34, 197, 94, 0.3);
         }
 
         table {
@@ -509,22 +560,22 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         th {
-            background: var(--color-bg-light);
+            background: rgba(30, 27, 75, 0.6);
             padding: 1rem;
             text-align: left;
-            color: var(--color-primary-dark);
+            color: #c7d2fe;
             font-weight: 600;
-            border-bottom: 2px solid var(--color-bg-lighter);
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
         }
 
         td {
             padding: 1rem;
-            border-bottom: 1px solid var(--color-bg-light);
-            color: var(--color-text);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            color: #94a3b8;
         }
 
         tr:hover {
-            background: var(--color-bg-light);
+            background: rgba(139, 92, 246, 0.1);
         }
 
         .status-badge {
@@ -536,18 +587,21 @@ $top_mentors = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .status-active {
-            background: #d1fae5;
-            color: #065f46;
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .status-pending {
-            background: #fef3c7;
-            color: #92400e;
+            background: rgba(234, 179, 8, 0.2);
+            color: #fde047;
+            border: 1px solid rgba(234, 179, 8, 0.3);
         }
 
         .status-suspended {
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .status-completed {
