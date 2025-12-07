@@ -226,9 +226,7 @@ $mysqli->close();
         }
 
         .header h1 {
-            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #e0e7ff;
             margin-bottom: 0.5rem;
             font-size: 2rem;
             font-weight: 800;

@@ -3,6 +3,23 @@
 require_once 'config.php';
 requireRole('mentee');
 
+// Function to get SVG icon for category
+function getCategoryIconSVG($categoryName) {
+    $icons = [
+        'Programming' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><path d="M8 6L4 10L8 14M16 6L20 10L16 14M12 4L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        'School' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><path d="M6 7L12 4L18 7L12 10L6 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 7V14L12 17L18 14V7" stroke="currentColor" stroke-width="2"/></svg>',
+        'University' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><path d="M4 10L12 6L20 10M12 6V18M9 13H15V18H9V13ZM4 10V16M20 10V16M3 16H21" stroke="currentColor" stroke-width="2"/></svg>',
+        'Biology' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="14" r="3" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="14" r="3" stroke="currentColor" stroke-width="2"/></svg>',
+        'Mathematics' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2"/><path d="M9 12H15M12 9V15" stroke="currentColor" stroke-width="2"/></svg>',
+        'Business' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><rect x="6" y="8" width="12" height="12" rx="1" stroke="currentColor" stroke-width="2"/><path d="M10 8V6C10 5 11 4 12 4C13 4 14 5 14 6V8" stroke="currentColor" stroke-width="2"/></svg>',
+        'Languages' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M4 12C4 12 7 7 12 7C17 7 20 12 20 12C20 12 17 17 12 17C7 17 4 12 4 12" stroke="currentColor" stroke-width="2"/></svg>',
+        'Arts' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="6" r="2" fill="currentColor"/><circle cx="14" cy="9" r="1.5" fill="currentColor"/></svg>',
+        'Science' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><path d="M9 4V10L6 16C5 18 6 20 8 20H16C18 20 19 18 18 16L15 10V4" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="15" r="1.5" fill="currentColor"/></svg>',
+        'Engineering' => '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:middle;"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2"/><path d="M12 5V10M12 14V19M5 12H10M14 12H19" stroke="currentColor" stroke-width="2"/></svg>'
+    ];
+    return $icons[$categoryName] ?? '📚';
+}
+
 $mysqli = getDB();
 $mentor_id = intval($_GET['id'] ?? 0);
 
@@ -486,12 +503,11 @@ $mysqli->close();
                             <?php 
                             if (!empty($mentor['category_names'])) {
                                 $cat_names = explode(',', $mentor['category_names']);
-                                $cat_icons = !empty($mentor['category_icons']) ? explode(',', $mentor['category_icons']) : [];
                                 for ($i = 0; $i < count($cat_names); $i++): 
-                                    $icon = $cat_icons[$i] ?? '📚';
+                                    $catName = trim($cat_names[$i]);
                             ?>
                                 <span class="category-badge">
-                                    <?php echo $icon . ' ' . trim($cat_names[$i]); ?>
+                                    <?php echo getCategoryIconSVG($catName) . ' ' . $catName; ?>
                                 </span>
                             <?php 
                                 endfor;

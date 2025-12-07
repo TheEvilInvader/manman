@@ -122,9 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $session['id'] > 0) {
         }
         
         h1 {
-            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #e0e7ff;
             text-align: center;
             margin-bottom: 2rem;
             font-size: 2rem;
